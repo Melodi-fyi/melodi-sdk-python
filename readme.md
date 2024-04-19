@@ -59,8 +59,8 @@ export MELODI_API_KEY='your_melodi_api_key_here'
 For development purposes, you can clone the repository and install the dependencies as follows:
 
 ```bash
-git clone https://github.com/yourusername/melodi-braintrust-reporter.git
-cd melodi-braintrust-reporter
+git clone https://github.com/Melodi-fyi/melodi-python-sdk.git
+cd melodi
 pip install -r requirements.txt
 ```
 
