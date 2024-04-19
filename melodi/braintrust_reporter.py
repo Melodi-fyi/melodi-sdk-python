@@ -6,13 +6,6 @@ import requests
 from typing import Optional
 from braintrust import Reporter
 
-import os
-import re
-import json
-import requests
-from typing import Optional
-from braintrust import Reporter
-
 def create_melodi_experiment(name: Optional[str] = None, 
                              instructions: Optional[str] = None, 
                              project: Optional[str] = None, 
