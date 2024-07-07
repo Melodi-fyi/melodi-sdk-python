@@ -19,8 +19,12 @@ class MelodiClient:
                 "variable or pass it as an argument."
             )
 
-        self.base_url = "https://app.melodi.fyi/api/external/experiments"
-        self.url = self.base_url + f"?apiKey={self.api_key}"
+        self.experiments_end_pt = "https://app.melodi.fyi/api/external/experiments"
+        self.experiments_end_pt = self.experiments_end_pt + f"?apiKey={self.api_key}"
+
+        self.log_samples_end_pt = "https://app.melodi.fyi/api/external/logs"
+        self.log_samples_end_pt = self.log_samples_end_pt + f"?apiKey={self.api_key}"
+
         self.logger = logging.getLogger(__name__)
 
         if verbose:
@@ -32,15 +36,15 @@ class MelodiClient:
     def _get_headers():
         return {"Content-Type": "application/json"}
 
-    def _send_request(self, request_data):
+    def _send_create_experiment_request(self, request_data):
         response = None
 
         try:
             response = requests.post(
-                self.url, headers=self._get_headers(), json=request_data
+                self.experiments_end_pt, headers=self._get_headers(), json=request_data
             )
             response.raise_for_status()
-            self.logger.info("Successfully create Melodi experiment.")
+            self.logger.info("Successfully created Melodi experiment.")
 
         except requests.exceptions.RequestException as e:
             self.logger.error(f"Failed to create Melodi experiment: {e}")
@@ -99,7 +103,37 @@ class MelodiClient:
         self.logger.info(msg=f"Loaded {len(res)} samples")
 
         return res
+    
+    def get_experiments(self):
+        return requests.request("GET", self.experiments_end_pt)
 
+    
+    def create_experiment(self, name: str, instructions: str):
+        request_data = {
+            "experiment": {
+                "name": name,
+                "instructions": instructions
+            }
+        }
+
+        self._send_create_experiment_request(request_data=request_data)
+
+    def log_sample_to_experiment(self, project_name: str, version_name: str, data: dict, another: dict):
+        request_data = {
+            "projectName": project_name,
+            "versionName": version_name,
+            "data": data
+        }
+
+        res = requests.request(
+            "POST", 
+            url=self.log_samples_end_pt, 
+            json=request_data, 
+            headers=self._get_headers()
+        )
+
+        return res
+        
     def create_binary_evaluation_experiment(
         self,
         name: str,
@@ -119,7 +153,7 @@ class MelodiClient:
             "samples": samples,
         }
 
-        self._send_request(request_data=request_data)
+        self._send_create_experiment_request(request_data=request_data)
 
     def create_bake_off_evaluation_experiment(
         self,
@@ -140,10 +174,10 @@ class MelodiClient:
             "comparisons": comparisons,
         }
 
-        self._send_request(request_data=request_data)
+        self._send_create_experiment_request(request_data=request_data)
 
     def log_binary_sample(self, experiment_id: int, sample: BinarySample) -> None:
-        endpoint = f"{self.base_url}/{experiment_id}/samples?apiKey={self.api_key}"
+        endpoint = f"{self.experiments_end_pt}/{experiment_id}/samples?apiKey={self.api_key}"
 
         try:
             response = requests.post(endpoint, json=sample.dict())
@@ -158,7 +192,7 @@ class MelodiClient:
         sample_2: BakeoffSample,
     ) -> None:
         comparison = {"samples": [sample_1.dict(), sample_2.dict()]}
-        endpoint = f"{self.base_url}/{experiment_id}/comparisons?apiKey={self.api_key}"
+        endpoint = f"{self.experiments_end_pt}/{experiment_id}/comparisons?apiKey={self.api_key}"
 
         try:
             response = requests.post(
@@ -169,7 +203,7 @@ class MelodiClient:
             raise MelodiAPIError(e)
 
     def make_shareable(self, experiment_id: int) -> Optional[str]:
-        url = f"{self.base_url}/{experiment_id}/shareable-link?apiKey={self.api_key}"
+        url = f"{self.experiments_end_pt}/{experiment_id}/shareable-link?apiKey={self.api_key}"
 
         response = requests.post(url)
 
