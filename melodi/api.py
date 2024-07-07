@@ -6,7 +6,15 @@ import json
 from typing import Optional
 
 from .exceptions import MelodiAPIError
-from .data_models import BinarySample, BakeoffSample
+from .data_models import (
+    BinarySample,
+    BakeoffSample,
+    FeedbackSample,
+    User,
+    Feedback,
+    UserFeedback,
+    Item,
+)
 
 
 class MelodiClient:
@@ -19,11 +27,20 @@ class MelodiClient:
                 "variable or pass it as an argument."
             )
 
-        self.experiments_end_pt = "https://app.melodi.fyi/api/external/experiments"
-        self.experiments_end_pt = self.experiments_end_pt + f"?apiKey={self.api_key}"
+        self.experiments_base_endpoint = (
+            "https://app.melodi.fyi/api/external/experiments"
+        )
+        self.experiments_endpoint = (
+            self.experiments_base_endpoint + f"?apiKey={self.api_key}"
+        )
 
-        self.log_samples_end_pt = "https://app.melodi.fyi/api/external/logs"
-        self.log_samples_end_pt = self.log_samples_end_pt + f"?apiKey={self.api_key}"
+        self.log_item_base_endpoint = "https://app.melodi.fyi/api/external/logs"
+        self.log_item_endpoint = self.log_item_base_endpoint + f"?apiKey={self.api_key}"
+
+        self.log_feedback_base_endpoint = "https://app.melodi.fyi/api/external/feedback"
+        self.log_feedback_endpoint = (
+            self.log_feedback_base_endpoint + f"?apiKey={self.api_key}"
+        )
 
         self.logger = logging.getLogger(__name__)
 
@@ -41,7 +58,9 @@ class MelodiClient:
 
         try:
             response = requests.post(
-                self.experiments_end_pt, headers=self._get_headers(), json=request_data
+                self.experiments_endpoint,
+                headers=self._get_headers(),
+                json=request_data,
             )
             response.raise_for_status()
             self.logger.info("Successfully created Melodi experiment.")
@@ -61,6 +80,8 @@ class MelodiClient:
                 raise MelodiAPIError(f"{e}")
         else:
             self.logger.error("Failed to extract experiment ID")
+
+        return response
 
     def load_samples(self, file_path: str, experiment_type: str) -> list:
         res = []
@@ -103,37 +124,37 @@ class MelodiClient:
         self.logger.info(msg=f"Loaded {len(res)} samples")
 
         return res
-    
-    def get_experiments(self):
-        return requests.request("GET", self.experiments_end_pt)
 
-    
+    def get_experiments(self):
+        return requests.request("GET", self.experiments_endpoint)
+
     def create_experiment(self, name: str, instructions: str):
-        request_data = {
-            "experiment": {
-                "name": name,
-                "instructions": instructions
-            }
-        }
+        request_data = {"experiment": {"name": name, "instructions": instructions}}
 
         self._send_create_experiment_request(request_data=request_data)
 
-    def log_sample_to_experiment(self, project_name: str, version_name: str, data: dict, another: dict):
-        request_data = {
-            "projectName": project_name,
-            "versionName": version_name,
-            "data": data
-        }
-
+    def log_item_to_experiment(self, item: Item):
         res = requests.request(
-            "POST", 
-            url=self.log_samples_end_pt, 
-            json=request_data, 
-            headers=self._get_headers()
+            "POST",
+            url=self.log_item_endpoint,
+            json=item.dict(),
+            headers=self._get_headers(),
         )
 
         return res
-        
+
+    def log_feedback(self, sample: FeedbackSample, feedback: Feedback, user: User):
+        user_feedback = UserFeedback(sample=sample, feedback=feedback, user=user)
+
+        res = requests.request(
+            "POST",
+            url=self.log_feedback_endpoint,
+            json=user_feedback.dict(),
+            headers=self._get_headers(),
+        )
+
+        return res
+
     def create_binary_evaluation_experiment(
         self,
         name: str,
@@ -177,11 +198,12 @@ class MelodiClient:
         self._send_create_experiment_request(request_data=request_data)
 
     def log_binary_sample(self, experiment_id: int, sample: BinarySample) -> None:
-        endpoint = f"{self.experiments_end_pt}/{experiment_id}/samples?apiKey={self.api_key}"
+        endpoint = f"{self.experiments_base_endpoint}/{experiment_id}/samples?apiKey={self.api_key}"
 
         try:
             response = requests.post(endpoint, json=sample.dict())
             response.raise_for_status()
+            return response
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
@@ -192,18 +214,19 @@ class MelodiClient:
         sample_2: BakeoffSample,
     ) -> None:
         comparison = {"samples": [sample_1.dict(), sample_2.dict()]}
-        endpoint = f"{self.experiments_end_pt}/{experiment_id}/comparisons?apiKey={self.api_key}"
+        endpoint = f"{self.experiments_endpoint}/{experiment_id}/comparisons?apiKey={self.api_key}"
 
         try:
             response = requests.post(
                 endpoint, headers=self._get_headers(), json=comparison
             )
             response.raise_for_status()
+            return response
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
     def make_shareable(self, experiment_id: int) -> Optional[str]:
-        url = f"{self.experiments_end_pt}/{experiment_id}/shareable-link?apiKey={self.api_key}"
+        url = f"{self.experiments_endpoint}/{experiment_id}/shareable-link?apiKey={self.api_key}"
 
         response = requests.post(url)
 

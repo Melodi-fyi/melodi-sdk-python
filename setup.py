@@ -13,6 +13,8 @@ setup(
         'autoevals',
         'braintrust',
         'requests',
+        'pydantic',
+        'email-validator'
     ],
     author='Kevin Walsh',
     author_email='kevin@melodi.fyi',

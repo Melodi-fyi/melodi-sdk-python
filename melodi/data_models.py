@@ -1,5 +1,5 @@
-from typing import Optional
-from pydantic import BaseModel
+from typing import Optional, Dict
+from pydantic import BaseModel, EmailStr
 
 
 class BinarySample(BaseModel):
@@ -12,3 +12,28 @@ class BakeoffSample(BaseModel):
     response: str
     message: Optional[str] = None
     title: Optional[str] = None
+
+class Item(BaseModel):
+    projectName: str
+    versionName: str
+    data: Dict
+
+class FeedbackSample(BaseModel):
+    project: str
+    projectVersion: str
+    input: str
+    output: str
+    metadata: Dict
+
+class Feedback(BaseModel):
+    feedbackType: str
+    feedbackText: str
+
+class User(BaseModel):
+    id: str
+    email: EmailStr
+
+class UserFeedback(BaseModel):
+    sample: FeedbackSample
+    feedback: Feedback
+    user: User
