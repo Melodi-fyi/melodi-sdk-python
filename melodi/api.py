@@ -1,20 +1,14 @@
+import json
+import logging
 import os
 import re
-import requests
-import logging
-import json
 from typing import Optional
 
+import requests
+
+from .data_models import (BakeoffSample, BinarySample, Feedback,
+                          FeedbackSample, Item, User, UserFeedback)
 from .exceptions import MelodiAPIError
-from .data_models import (
-    BinarySample,
-    BakeoffSample,
-    FeedbackSample,
-    User,
-    Feedback,
-    UserFeedback,
-    Item,
-)
 
 
 class MelodiClient:
@@ -35,7 +29,8 @@ class MelodiClient:
         )
 
         self.log_item_base_endpoint = "https://app.melodi.fyi/api/external/logs"
-        self.log_item_endpoint = self.log_item_base_endpoint + f"?apiKey={self.api_key}"
+        self.log_item_endpoint = self.log_item_base_endpoint + \
+            f"?apiKey={self.api_key}"
 
         self.log_feedback_base_endpoint = "https://app.melodi.fyi/api/external/feedback"
         self.log_feedback_endpoint = (
@@ -95,7 +90,8 @@ class MelodiClient:
 
                     if "response" not in json_object:
                         raise Exception(
-                            f'Sample {json_object} is missing "response" ' f"attribute."
+                            f'Sample {
+                                json_object} is missing "response" ' f"attribute."
                         )
 
                     res.append(json_object)
@@ -110,12 +106,13 @@ class MelodiClient:
                     for sample in samples:
                         if "response" not in sample:
                             raise Exception(
-                                f'Sample {sample} is missing "response" ' f"attribute."
+                                f'Sample {
+                                    sample} is missing "response" ' f"attribute."
                             )
 
-                        elif "promptLabel" not in sample:
+                        elif "version" not in sample:
                             raise Exception(
-                                f'Sample {sample} is missing "promptLabel" '
+                                f'Sample {sample} is missing "version" '
                                 f"attribute."
                             )
 
@@ -128,8 +125,12 @@ class MelodiClient:
     def get_experiments(self):
         return requests.request("GET", self.experiments_endpoint)
 
-    def create_experiment(self, name: str, instructions: str):
-        request_data = {"experiment": {"name": name, "instructions": instructions}}
+    def create_experiment(self, name: str, instructions: str, project: str):
+        request_data = {"experiment": {
+            "name": name,
+            "instructions": instructions,
+            "project": project,
+        }}
 
         self._send_create_experiment_request(request_data=request_data)
 
@@ -144,7 +145,8 @@ class MelodiClient:
         return res
 
     def log_feedback(self, sample: FeedbackSample, feedback: Feedback, user: User):
-        user_feedback = UserFeedback(sample=sample, feedback=feedback, user=user)
+        user_feedback = UserFeedback(
+            sample=sample, feedback=feedback, user=user)
 
         res = requests.request(
             "POST",
@@ -198,7 +200,8 @@ class MelodiClient:
         self._send_create_experiment_request(request_data=request_data)
 
     def log_binary_sample(self, experiment_id: int, sample: BinarySample) -> None:
-        endpoint = f"{self.experiments_base_endpoint}/{experiment_id}/samples?apiKey={self.api_key}"
+        endpoint = f"{
+            self.experiments_base_endpoint}/{experiment_id}/samples?apiKey={self.api_key}"
 
         try:
             response = requests.post(endpoint, json=sample.dict())
@@ -214,7 +217,8 @@ class MelodiClient:
         sample_2: BakeoffSample,
     ) -> None:
         comparison = {"samples": [sample_1.dict(), sample_2.dict()]}
-        endpoint = f"{self.experiments_endpoint}/{experiment_id}/comparisons?apiKey={self.api_key}"
+        endpoint = f"{
+            self.experiments_endpoint}/{experiment_id}/comparisons?apiKey={self.api_key}"
 
         try:
             response = requests.post(
@@ -226,7 +230,8 @@ class MelodiClient:
             raise MelodiAPIError(e)
 
     def make_shareable(self, experiment_id: int) -> Optional[str]:
-        url = f"{self.experiments_endpoint}/{experiment_id}/shareable-link?apiKey={self.api_key}"
+        url = f"{
+            self.experiments_endpoint}/{experiment_id}/shareable-link?apiKey={self.api_key}"
 
         response = requests.post(url)
 
