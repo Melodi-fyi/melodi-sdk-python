@@ -131,7 +131,7 @@ class MelodiClient:
 
         self._send_create_experiment_request(request_data=request_data)
 
-    def log_item_to_experiment(self, item: Item):
+    def create_log(self, item: Item):
         res = requests.request(
             "POST",
             url=self.log_item_endpoint,
