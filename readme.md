@@ -3,7 +3,7 @@ Melodi is a platform for feedback, QA, and online evaluations of LLM application
 - Production: Logging and end user feedback
 - Pre-production: Programmatically create experiments for Expert Review in the Melodi UI for rating LLM outputs, editing LLM calls for ideal/golden datasets, and AB/preference testing.
 
-For a working example, please review [the quickstart notebook](/examples/quickstart.ipynb)
+For a working example, please review [the quickstart notebook](https://github.com/Melodi-fyi/melodi-sdk-python/blob/master/examples/quickstart.ipynb)
 
 ## Installation
 
@@ -16,6 +16,7 @@ pip install melodi
 ## Setup
 
 ```python
+from melodi.api import MelodiClient
 from melodi.data_models import (
     BinarySample,
     BakeoffSample,
