@@ -76,7 +76,7 @@ class MelodiClient:
         else:
             self.logger.error("Failed to extract experiment ID")
 
-        return response
+        return {"feedbackUrl": feedback_url, "experimentId": exp_id}
 
     def load_samples(self, file_path: str, experiment_type: str) -> list:
         res = []
@@ -129,7 +129,7 @@ class MelodiClient:
             "project": project,
         }}
 
-        self._send_create_experiment_request(request_data=request_data)
+        return self._send_create_experiment_request(request_data=request_data)
 
     def create_log(self, item: Item):
         res = requests.request(
@@ -173,7 +173,7 @@ class MelodiClient:
             "samples": samples,
         }
 
-        self._send_create_experiment_request(request_data=request_data)
+        return self._send_create_experiment_request(request_data=request_data)
 
     def create_bake_off_evaluation_experiment(
         self,
@@ -194,7 +194,7 @@ class MelodiClient:
             "comparisons": comparisons,
         }
 
-        self._send_create_experiment_request(request_data=request_data)
+        return self._send_create_experiment_request(request_data=request_data)
 
     def log_binary_sample(self, experiment_id: int, sample: BinarySample) -> None:
         endpoint = f"{self.experiments_base_endpoint}/{experiment_id}/samples?apiKey={self.api_key}"
