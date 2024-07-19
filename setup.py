@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='melodi',
-    version='0.0.1',
+    version='0.0.2',
     packages=find_packages(),
     install_requires=[
         'autoevals',
@@ -16,8 +16,8 @@ setup(
         'pydantic',
         'email-validator'
     ],
-    author='Kevin Walsh',
-    author_email='kevin@melodi.fyi',
+    author='Melodi Ltd',
+    author_email='info@melodi.fyi',
     description='Helper functions for Melodi',
     keywords='melodi',
     long_description=long_description,
