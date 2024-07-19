@@ -132,7 +132,11 @@ client.log_bake_off_comparison(
     experiment_id=EXP_ID, sample_1=sample_A, sample_2=sample_B
 )
 ```
-
+### Get a shareable link for Expert Review
+This returns a no-auth link so that you can collect Expert Reviews without having to create logins for your reviewers.
+```python
+client.make_shareable(EXP_ID)
+```
 
 ## Contact
 
