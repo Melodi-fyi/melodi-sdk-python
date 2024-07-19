@@ -32,9 +32,9 @@ class MelodiClient:
         self.log_item_endpoint = self.log_item_base_endpoint + \
             f"?apiKey={self.api_key}"
 
-        self.log_feedback_base_endpoint = "https://app.melodi.fyi/api/external/feedback"
-        self.log_feedback_endpoint = (
-            self.log_feedback_base_endpoint + f"?apiKey={self.api_key}"
+        self.create_feedback_base_endpoint = "https://app.melodi.fyi/api/external/feedback"
+        self.create_feedback_endpoint = (
+            self.create_feedback_base_endpoint + f"?apiKey={self.api_key}"
         )
 
         self.logger = logging.getLogger(__name__)
@@ -141,13 +141,13 @@ class MelodiClient:
 
         return res
 
-    def log_feedback(self, sample: FeedbackSample, feedback: Feedback, user: User):
+    def create_feedback(self, sample: FeedbackSample, feedback: Feedback, user: User):
         user_feedback = UserFeedback(
             sample=sample, feedback=feedback, user=user)
 
         res = requests.request(
             "POST",
-            url=self.log_feedback_endpoint,
+            url=self.create_feedback_endpoint,
             json=user_feedback.dict(),
             headers=self._get_headers(),
         )
