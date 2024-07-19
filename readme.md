@@ -69,7 +69,7 @@ client.create_feedback(sample, feedback, user)
 
 ## Pre-production functions
 These functions are designed to be incorporated into your experimentation and pre-production process. Typically, these functions are used in a notebook setting, where you're experimenting and developing a model (or pipeline) before deploying that model into a user facing app. These functions create experiments for manual review in the Melodi Expert Review UI, which can be used by you, your team, or shared externally with customers or labelers to evaluate LLM responses. 
-- **Binary**: A simple pass/fail assessment. Best for initial model validation and for creating ideal/golden datasets by editing model responses in the app. 
+- **Binary**: A simple pass/fail assessment. Best for initial model validation and for creating ideal/golden datasets by editing model responses in Melodi. 
 - **Bake-off** (aka AB Test): Preference testing between different versions of a model. 
 
 ### Binary Experiment
@@ -100,7 +100,7 @@ EXP_ID = <YOUR_EXPERIMENT_ID>
 sample_A = BinarySample(response="This is a response", title="This is a title")
 client.log_binary_sample(experiment_id=EXP_ID, sample=sample_A)
 ```
-### Binary Experiment
+### Bake-off Experiment
 #### Batch
 ```python
 bakeoff_samples = client.load_samples(
