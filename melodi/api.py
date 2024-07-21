@@ -6,8 +6,16 @@ from typing import Optional
 
 import requests
 
-from .data_models import (BakeoffSample, BinarySample, Feedback,
-                          FeedbackSample, Item, User, UserFeedback)
+from .data_models import (
+    BakeoffSample,
+    BinarySample,
+    Feedback,
+    FeedbackSample,
+    Item,
+    User,
+    UserFeedback,
+    Samples
+)
 from .exceptions import MelodiAPIError
 
 
@@ -29,10 +37,11 @@ class MelodiClient:
         )
 
         self.log_item_base_endpoint = "https://app.melodi.fyi/api/external/logs"
-        self.log_item_endpoint = self.log_item_base_endpoint + \
-            f"?apiKey={self.api_key}"
+        self.log_item_endpoint = self.log_item_base_endpoint + f"?apiKey={self.api_key}"
 
-        self.create_feedback_base_endpoint = "https://app.melodi.fyi/api/external/feedback"
+        self.create_feedback_base_endpoint = (
+            "https://app.melodi.fyi/api/external/feedback"
+        )
         self.create_feedback_endpoint = (
             self.create_feedback_base_endpoint + f"?apiKey={self.api_key}"
         )
@@ -123,13 +132,36 @@ class MelodiClient:
         return requests.request("GET", self.experiments_endpoint)
 
     def create_experiment(self, name: str, instructions: str, project: str):
-        request_data = {"experiment": {
-            "name": name,
-            "instructions": instructions,
-            "project": project,
-        }}
+        request_data = {
+            "experiment": {
+                "name": name,
+                "instructions": instructions,
+                "project": project,
+            }
+        }
 
         return self._send_create_experiment_request(request_data=request_data)
+
+    def create_experiment_with_samples(
+        self,
+        name: str,
+        samples: Samples,
+        instructions: str = None,
+        project: str = None,
+        version: str = None,
+    ):
+        request_data = {
+            "experiment": {
+                "name": name,
+                "instructions": instructions,
+                "project": project,
+                "version": version
+            },
+            "samples": samples.dict()
+        }
+
+        return self._send_create_experiment_request(request_data=request_data)
+        
 
     def create_log(self, item: Item):
         res = requests.request(
@@ -142,8 +174,7 @@ class MelodiClient:
         return res
 
     def create_feedback(self, sample: FeedbackSample, feedback: Feedback, user: User):
-        user_feedback = UserFeedback(
-            sample=sample, feedback=feedback, user=user)
+        user_feedback = UserFeedback(sample=sample, feedback=feedback, user=user)
 
         res = requests.request(
             "POST",
