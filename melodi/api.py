@@ -14,7 +14,8 @@ from .data_models import (
     Item,
     User,
     UserFeedback,
-    Samples
+    Samples,
+    Comparisons
 )
 from .exceptions import MelodiAPIError
 
@@ -158,6 +159,26 @@ class MelodiClient:
                 "version": version
             },
             "samples": samples.dict()
+        }
+
+        return self._send_create_experiment_request(request_data=request_data)
+    
+    def create_experiment_with_comparisons(
+        self,
+        name: str,
+        comparisons: Comparisons,
+        instructions: str = None,
+        project: str = None,
+        version: str = None,
+    ):
+        request_data = {
+            "experiment": {
+                "name": name,
+                "instructions": instructions,
+                "project": project,
+                "version": version
+            },
+            "comparisons": comparisons.dict()
         }
 
         return self._send_create_experiment_request(request_data=request_data)

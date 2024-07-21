@@ -10,6 +10,15 @@ class Sample(BaseModel):
 class Samples(BaseModel):
     samples: List[Sample]
 
+class ComparisonSample(BaseModel):
+    title: Optional[str] = None
+    message: Optional[str] = None
+    response: str
+    version: str
+
+class Comparisons(BaseModel):
+    samples: List[ComparisonSample]
+
 class BinarySample(BaseModel):
     response: str
     title: Optional[str] = None
