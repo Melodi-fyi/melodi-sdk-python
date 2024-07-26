@@ -72,6 +72,7 @@ class MelodiClient:
 
         except requests.exceptions.RequestException as e:
             self.logger.error(f"Failed to create Melodi experiment: {e}")
+            self.logger.error(f"Response: {response.json()}")
 
         if response and response.status_code == 200:
             try:
@@ -81,12 +82,13 @@ class MelodiClient:
                 self.logger.info(
                     f"Experiment ID: {exp_id}",
                 )
+                return {"feedbackUrl": feedback_url, "experimentId": exp_id}
             except MelodiAPIError as e:
                 raise MelodiAPIError(f"{e}")
         else:
             self.logger.error("Failed to extract experiment ID")
 
-        return {"feedbackUrl": feedback_url, "experimentId": exp_id}
+
 
     def load_samples(self, file_path: str, experiment_type: str) -> list:
         res = []
