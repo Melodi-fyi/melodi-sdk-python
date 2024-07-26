@@ -1,7 +1,23 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 from pydantic import BaseModel, EmailStr
 
+class Sample(BaseModel):
+    title: Optional[str] = None
+    message: Optional[str] = None
+    response: str
+
+class Samples(BaseModel):
+    samples: List[Sample]
+
+class ComparisonSample(BaseModel):
+    title: Optional[str] = None
+    message: Optional[str] = None
+    response: str
+    version: str
+
+class Comparisons(BaseModel):
+    samples: List[ComparisonSample]
 
 class BinarySample(BaseModel):
     response: str

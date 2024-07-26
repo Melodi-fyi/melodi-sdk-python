@@ -6,8 +6,17 @@ from typing import Optional
 
 import requests
 
-from .data_models import (BakeoffSample, BinarySample, Feedback,
-                          FeedbackSample, Item, User, UserFeedback)
+from .data_models import (
+    BakeoffSample,
+    BinarySample,
+    Feedback,
+    FeedbackSample,
+    Item,
+    User,
+    UserFeedback,
+    Samples,
+    Comparisons
+)
 from .exceptions import MelodiAPIError
 
 
@@ -29,10 +38,11 @@ class MelodiClient:
         )
 
         self.log_item_base_endpoint = "https://app.melodi.fyi/api/external/logs"
-        self.log_item_endpoint = self.log_item_base_endpoint + \
-            f"?apiKey={self.api_key}"
+        self.log_item_endpoint = self.log_item_base_endpoint + f"?apiKey={self.api_key}"
 
-        self.create_feedback_base_endpoint = "https://app.melodi.fyi/api/external/feedback"
+        self.create_feedback_base_endpoint = (
+            "https://app.melodi.fyi/api/external/feedback"
+        )
         self.create_feedback_endpoint = (
             self.create_feedback_base_endpoint + f"?apiKey={self.api_key}"
         )
@@ -62,6 +72,7 @@ class MelodiClient:
 
         except requests.exceptions.RequestException as e:
             self.logger.error(f"Failed to create Melodi experiment: {e}")
+            self.logger.error(f"Response: {response.json()}")
 
         if response and response.status_code == 200:
             try:
@@ -71,12 +82,13 @@ class MelodiClient:
                 self.logger.info(
                     f"Experiment ID: {exp_id}",
                 )
+                return {"feedbackUrl": feedback_url, "experimentId": exp_id}
             except MelodiAPIError as e:
                 raise MelodiAPIError(f"{e}")
         else:
             self.logger.error("Failed to extract experiment ID")
 
-        return {"feedbackUrl": feedback_url, "experimentId": exp_id}
+
 
     def load_samples(self, file_path: str, experiment_type: str) -> list:
         res = []
@@ -123,11 +135,53 @@ class MelodiClient:
         return requests.request("GET", self.experiments_endpoint)
 
     def create_experiment(self, name: str, instructions: str, project: str):
-        request_data = {"experiment": {
-            "name": name,
-            "instructions": instructions,
-            "project": project,
-        }}
+        request_data = {
+            "experiment": {
+                "name": name,
+                "instructions": instructions,
+                "project": project,
+            }
+        }
+
+        return self._send_create_experiment_request(request_data=request_data)
+
+    def create_experiment_with_samples(
+        self,
+        name: str,
+        samples: Samples,
+        instructions: str = None,
+        project: str = None,
+        version: str = None,
+    ):
+        request_data = {
+            "experiment": {
+                "name": name,
+                "instructions": instructions,
+                "project": project,
+                "version": version
+            },
+            "samples": samples
+        }
+
+        return self._send_create_experiment_request(request_data=request_data)
+
+    def create_experiment_with_comparisons(
+        self,
+        name: str,
+        comparisons: Comparisons,
+        instructions: str = None,
+        project: str = None,
+        version: str = None,
+    ):
+        request_data = {
+            "experiment": {
+                "name": name,
+                "instructions": instructions,
+                "project": project,
+                "version": version
+            },
+            "comparisons": comparisons
+        }
 
         return self._send_create_experiment_request(request_data=request_data)
 
@@ -142,8 +196,7 @@ class MelodiClient:
         return res
 
     def create_feedback(self, sample: FeedbackSample, feedback: Feedback, user: User):
-        user_feedback = UserFeedback(
-            sample=sample, feedback=feedback, user=user)
+        user_feedback = UserFeedback(sample=sample, feedback=feedback, user=user)
 
         res = requests.request(
             "POST",
