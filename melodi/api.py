@@ -162,7 +162,7 @@ class MelodiClient:
         }
 
         return self._send_create_experiment_request(request_data=request_data)
-    
+
     def create_experiment_with_comparisons(
         self,
         name: str,
@@ -182,7 +182,6 @@ class MelodiClient:
         }
 
         return self._send_create_experiment_request(request_data=request_data)
-        
 
     def create_log(self, item: Item):
         res = requests.request(
