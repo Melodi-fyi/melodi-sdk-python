@@ -160,7 +160,7 @@ class MelodiClient:
                 "project": project,
                 "version": version
             },
-            "samples": samples.dict()
+            "samples": samples
         }
 
         return self._send_create_experiment_request(request_data=request_data)
@@ -180,7 +180,7 @@ class MelodiClient:
                 "project": project,
                 "version": version
             },
-            "comparisons": comparisons.dict()
+            "comparisons": comparisons
         }
 
         return self._send_create_experiment_request(request_data=request_data)
