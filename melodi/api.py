@@ -6,18 +6,9 @@ from typing import Optional
 
 import requests
 
-from .data_models import (
-    BakeoffSample,
-    BinarySample,
-    Comparisons,
-    Feedback,
-    FeedbackSample,
-    Item,
-    Samples,
-    Thread,
-    User,
-    UserFeedback
-)
+from .data_models import (BakeoffSample, BinarySample, Comparisons, Feedback,
+                          FeedbackSample, Item, Samples, Thread, User,
+                          UserFeedback)
 from .exceptions import MelodiAPIError
 
 
@@ -31,24 +22,26 @@ class MelodiClient:
                 "variable or pass it as an argument."
             )
 
+        self.base_url = os.environ.get("MELODI_BASE_URL_OVERRIDE") or "https://app.melodi.fyi"
+
         self.experiments_base_endpoint = (
-            "https://app.melodi.fyi/api/external/experiments"
+            self.base_url + "/api/external/experiments"
         )
         self.experiments_endpoint = (
             self.experiments_base_endpoint + f"?apiKey={self.api_key}"
         )
 
-        self.log_item_base_endpoint = "https://app.melodi.fyi/api/external/logs"
+        self.log_item_base_endpoint = self.base_url + "/api/external/logs"
         self.log_item_endpoint = self.log_item_base_endpoint + f"?apiKey={self.api_key}"
 
         self.create_feedback_base_endpoint = (
-            "https://app.melodi.fyi/api/external/feedback"
+            self.base_url + "/api/external/feedback"
         )
         self.create_feedback_endpoint = (
             self.create_feedback_base_endpoint + f"?apiKey={self.api_key}"
         )
 
-        self.threads_base_endpoint = "https://app.melodi.fyi/api/threads"
+        self.threads_base_endpoint = self.base_url + "/api/external/threads"
         self.threads_endpoint = self.threads_base_endpoint + f"?apiKey={self.api_key}"
 
         self.logger = logging.getLogger(__name__)
@@ -297,7 +290,7 @@ class MelodiClient:
 
         try:
             response = requests.post(
-                url, headers=self._get_headers(), json=thread
+                url, headers=self._get_headers(), json=thread.dict()
             )
             response.raise_for_status()
             return response.id
