@@ -6,18 +6,9 @@ from typing import Optional
 
 import requests
 
-from .data_models import (
-    BakeoffSample,
-    BinarySample,
-    Comparisons,
-    Feedback,
-    FeedbackSample,
-    Item,
-    Samples,
-    Thread,
-    User,
-    UserFeedback
-)
+from .data_models import (BakeoffSample, BinarySample, Comparisons, Feedback,
+                          FeedbackSample, Item, Samples, Thread, User,
+                          UserFeedback)
 from .exceptions import MelodiAPIError
 
 
@@ -297,7 +288,7 @@ class MelodiClient:
 
         try:
             response = requests.post(
-                url, headers=self._get_headers(), json=thread
+                url, headers=self._get_headers(), json=thread.dict()
             )
             response.raise_for_status()
             return response.id
