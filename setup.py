@@ -1,4 +1,3 @@
-# setup.py
 from pathlib import Path
 
 from setuptools import find_packages, setup
@@ -22,5 +21,5 @@ setup(
     description='Helper functions for Melodi',
     keywords='melodi',
     long_description=long_description,
-    long_description_content_type='text/markdown',  # or 'text/x-rst', 'text/plain'
+    long_description_content_type='text/markdown',
 )
