@@ -7,11 +7,12 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='melodi',
-    version='0.0.5',
+    version='0.0.8',
     packages=find_packages(),
     install_requires=[
         'requests',
-        'pydantic'
+        'pydantic',
+        'email-validator'
     ],
     author='Melodi Ltd',
     author_email='info@melodi.fyi',

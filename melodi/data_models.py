@@ -1,6 +1,6 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
-from pydantic import BaseModel, EmailStr, Union
+from pydantic import BaseModel, EmailStr
 
 
 class Sample(BaseModel):
