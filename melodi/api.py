@@ -9,13 +9,14 @@ import requests
 from .data_models import (
     BakeoffSample,
     BinarySample,
+    Comparisons,
     Feedback,
     FeedbackSample,
     Item,
-    User,
-    UserFeedback,
     Samples,
-    Comparisons
+    Thread,
+    User,
+    UserFeedback
 )
 from .exceptions import MelodiAPIError
 
@@ -46,6 +47,9 @@ class MelodiClient:
         self.create_feedback_endpoint = (
             self.create_feedback_base_endpoint + f"?apiKey={self.api_key}"
         )
+
+        self.threads_base_endpoint = "https://app.melodi.fyi/api/threads"
+        self.threads_endpoint = self.threads_base_endpoint + f"?apiKey={self.api_key}"
 
         self.logger = logging.getLogger(__name__)
 
@@ -287,3 +291,15 @@ class MelodiClient:
             if response.status_code == 200
             else None
         )
+
+    def create_thread(self, thread: Thread) -> int:
+        url = self.threads_endpoint
+
+        try:
+            response = requests.post(
+                url, headers=self._get_headers(), json=thread
+            )
+            response.raise_for_status()
+            return response.id
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)

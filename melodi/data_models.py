@@ -1,6 +1,7 @@
-from typing import Dict, Optional, List
+from typing import Dict, List, Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Union
+
 
 class Sample(BaseModel):
     title: Optional[str] = None
@@ -52,10 +53,20 @@ class Feedback(BaseModel):
 
 class User(BaseModel):
     id: str
-    email: EmailStr
-
+    email: Optional[EmailStr] = None
 
 class UserFeedback(BaseModel):
     sample: FeedbackSample
     feedback: Feedback
     user: User
+class Message(BaseModel):
+    role: str
+    content: str
+    metadata: dict[str, Union[str, int]]
+
+class Thread(BaseModel):
+    externalId: Optional[str] = None
+    projectId: int
+    messages: List[Message]
+    metadata: dict[str, Union[str, int]]
+    externalUser: Optional[User]
