@@ -6,9 +6,18 @@ from typing import Optional
 
 import requests
 
-from .data_models import (BakeoffSample, BinarySample, Comparisons, Feedback,
-                          FeedbackSample, Item, Samples, Thread, User,
-                          UserFeedback)
+from .data_models import (
+    BakeoffSample,
+    BinarySample,
+    Comparisons,
+    Feedback,
+    FeedbackSample,
+    Item,
+    Samples,
+    Thread,
+    User,
+    UserFeedback
+)
 from .exceptions import MelodiAPIError
 
 
