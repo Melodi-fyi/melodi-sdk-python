@@ -294,4 +294,3 @@ class MelodiClient:
             return response.id
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
-
