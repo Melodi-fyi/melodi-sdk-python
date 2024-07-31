@@ -71,3 +71,12 @@ class Thread(BaseModel):
     messages: List[Message]
     metadata: dict[str, Union[str, int]] = {}
     externalUser: Optional[User] = None
+
+class ThreadResponse(Thread):
+    id: int
+
+class IssueLogAssociation(BaseModel):
+    id: int
+    issueId: int
+    logId: int
+    userId: int
