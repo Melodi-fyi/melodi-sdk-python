@@ -1,6 +1,6 @@
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Literal, Optional, Union
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Json
 
 
 class Sample(BaseModel):
@@ -80,3 +80,39 @@ class IssueLogAssociation(BaseModel):
     issueId: int
     logId: int
     userId: int
+
+class LogInput(BaseModel):
+  id: int
+  type: Literal['json', 'markdown', 'messages']
+
+  json: Optional[Json] = None
+  markdown: Optional[str] = None
+  messages: List[Message] = []
+
+class LogOutput(BaseModel):
+  id: int
+
+  type: Literal['json', 'markdown', 'message']
+
+  json: Optional[Json] = None
+  markdown: Optional[str] = None
+  messages: Optional[Message] = None
+
+class Log(BaseModel):
+  id: int
+  organizationId: int
+  projectId: int
+
+  externalId: Optional[str] = None
+
+  input: Optional[LogInput]
+  output: LogOutput
+
+  thread: Optional[ThreadResponse] = None
+
+  externalUser:   Optional[User] = None
+
+  metadata: dict[str, Union[str, int]] = {}
+
+  issueAssociations: List[IssueLogAssociation]
+
