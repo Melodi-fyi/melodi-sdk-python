@@ -293,6 +293,6 @@ class MelodiClient:
                 url, headers=self._get_headers(), json=thread.dict()
             )
             response.raise_for_status()
-            return response.id
+            return response.json()
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
