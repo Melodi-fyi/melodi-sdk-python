@@ -7,8 +7,9 @@ from typing import Optional
 import requests
 
 from .data_models import (BakeoffSample, BinarySample, Comparisons, Feedback,
-                          FeedbackSample, IssueLogAssociation, Item, Log,
-                          Samples, Thread, ThreadResponse, User, UserFeedback)
+                          FeedbackSample, IntentLogAssociation,
+                          IssueLogAssociation, Item, Log, Samples, Thread,
+                          ThreadResponse, User, UserFeedback)
 from .exceptions import MelodiAPIError
 
 
@@ -48,6 +49,9 @@ class MelodiClient:
 
         self.issue_log_associations_base_endpoint = self.base_url + "/api/external/issue-log-associations"
         self.issue_log_associations_endpoint = self.issue_log_associations_base_endpoint + f"?apiKey={self.api_key}"
+
+        self.intent_log_associations_base_endpoint = self.base_url + "/api/external/issue-log-associations"
+        self.intent_log_associations_endpoint = self.intent_log_associations_base_endpoint + f"?apiKey={self.api_key}"
 
         self.logger = logging.getLogger(__name__)
 
@@ -337,6 +341,39 @@ class MelodiClient:
             raise MelodiAPIError(f"Issue {issue_id} is not associated to log {log_id}")
 
         url = f"{self.issue_log_associations_base_endpoint}/{issue_log_association_id}?apiKey={self.api_key}"
+
+        try:
+            response = requests.delete(
+                url, headers=self._get_headers()
+            )
+            response.raise_for_status()
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)
+
+    def add_intent_to_log(self, intent_id: int, log_id: int) -> IntentLogAssociation:
+        url = self.issue_log_associations_endpoint
+
+        try:
+            response = requests.post(
+                url, headers=self._get_headers(), json={"intentId": intent_id, "logId": log_id}
+            )
+            response.raise_for_status()
+            return response.json()
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)
+
+    def remove_intent_from_log(self, intent_id: int, log_id: int) -> None:
+        log = self.get_log(log_id)
+
+        for intent_association in log.intentAssociations:
+            if (intent_association.intentId == intent_id):
+                intent_log_association_id = intent_association.id
+                break
+
+        if not intent_log_association_id:
+            raise MelodiAPIError(f"Intent {intent_id} is not associated to log {log_id}")
+
+        url = f"{self.intent_log_associations_base_endpoint}/{intent_log_association_id}?apiKey={self.api_key}"
 
         try:
             response = requests.delete(

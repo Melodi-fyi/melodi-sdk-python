@@ -81,6 +81,11 @@ class IssueLogAssociation(BaseModel):
     logId: int
     userId: int
 
+class IntentLogAssociation(BaseModel):
+    id: int
+    intentId: int
+    logId: int
+    userId: int
 class LogInput(BaseModel):
   id: int
   type: Literal['json', 'markdown', 'messages']
@@ -115,4 +120,5 @@ class Log(BaseModel):
   metadata: dict[str, Union[str, int]] = {}
 
   issueAssociations: List[IssueLogAssociation]
+  intentAssociations: List[IntentLogAssociation]
 
