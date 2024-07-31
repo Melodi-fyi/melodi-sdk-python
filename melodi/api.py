@@ -7,8 +7,8 @@ from typing import Optional
 import requests
 
 from .data_models import (BakeoffSample, BinarySample, Comparisons, Feedback,
-                          FeedbackSample, Item, Samples, Thread, User,
-                          UserFeedback)
+                          FeedbackSample, IssueLogAssociation, Item, Samples,
+                          Thread, ThreadResponse, User, UserFeedback)
 from .exceptions import MelodiAPIError
 
 
@@ -43,6 +43,9 @@ class MelodiClient:
 
         self.threads_base_endpoint = self.base_url + "/api/external/threads"
         self.threads_endpoint = self.threads_base_endpoint + f"?apiKey={self.api_key}"
+
+        self.issue_log_associations_base_endpoint = self.base_url + "/api/external/issue-log-associations"
+        self.issue_log_associations_endpoint = self.issue_log_associations_base_endpoint + f"?apiKey={self.api_key}"
 
         self.logger = logging.getLogger(__name__)
 
@@ -285,12 +288,24 @@ class MelodiClient:
             else None
         )
 
-    def create_thread(self, thread: Thread) -> int:
+    def create_thread(self, thread: Thread) -> ThreadResponse:
         url = self.threads_endpoint
 
         try:
             response = requests.post(
                 url, headers=self._get_headers(), json=thread.dict()
+            )
+            response.raise_for_status()
+            return response.json()
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)
+
+    def add_issue_to_log(self, issue_id: int, log_id: int) -> IssueLogAssociation:
+        url = self.issue_log_associations_endpoint
+
+        try:
+            response = requests.post(
+                url, headers=self._get_headers(), json={"issueId": issue_id, "logId": log_id}
             )
             response.raise_for_status()
             return response.json()
