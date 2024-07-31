@@ -7,8 +7,8 @@ from typing import Optional
 import requests
 
 from .data_models import (BakeoffSample, BinarySample, Comparisons, Feedback,
-                          FeedbackSample, IssueLogAssociation, Item, Samples,
-                          Thread, ThreadResponse, User, UserFeedback)
+                          FeedbackSample, IssueLogAssociation, Item, Log,
+                          Samples, Thread, ThreadResponse, User, UserFeedback)
 from .exceptions import MelodiAPIError
 
 
@@ -40,6 +40,8 @@ class MelodiClient:
         self.create_feedback_endpoint = (
             self.create_feedback_base_endpoint + f"?apiKey={self.api_key}"
         )
+
+        self.logs_base_endpoint = self.base_url + "/api/external/logs"
 
         self.threads_base_endpoint = self.base_url + "/api/external/threads"
         self.threads_endpoint = self.threads_base_endpoint + f"?apiKey={self.api_key}"
@@ -295,6 +297,17 @@ class MelodiClient:
             response = requests.post(
                 url, headers=self._get_headers(), json=thread.dict()
             )
+            response.raise_for_status()
+            return response.json()
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)
+
+    def get_log(self, log_id: int) -> Log:
+        url = f"{self.logs_base_endpoint}/{log_id}?apiKey={self.api_key}"
+
+        try:
+            response = requests.request("GET", url)
+
             response.raise_for_status()
             return response.json()
         except MelodiAPIError as e:
