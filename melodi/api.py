@@ -5,6 +5,7 @@ import re
 from typing import Optional
 
 import requests
+from pydantic.tools import parse_obj_as
 
 from .data_models import (BakeoffSample, BinarySample, Comparisons, Feedback,
                           FeedbackSample, IntentLogAssociation,
@@ -302,7 +303,7 @@ class MelodiClient:
                 url, headers=self._get_headers(), json=thread.dict()
             )
             response.raise_for_status()
-            return response.json()
+            return parse_obj_as(Thread, response.json())
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
@@ -313,7 +314,7 @@ class MelodiClient:
             response = requests.request("GET", url)
 
             response.raise_for_status()
-            return response.json()
+            return parse_obj_as(Log, response.json())
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
