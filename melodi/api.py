@@ -52,7 +52,7 @@ class MelodiClient:
         self.issue_log_associations_base_endpoint = self.base_url + "/api/external/issue-log-associations"
         self.issue_log_associations_endpoint = self.issue_log_associations_base_endpoint + f"?apiKey={self.api_key}"
 
-        self.intent_log_associations_base_endpoint = self.base_url + "/api/external/issue-log-associations"
+        self.intent_log_associations_base_endpoint = self.base_url + "/api/external/intent-log-associations"
         self.intent_log_associations_endpoint = self.intent_log_associations_base_endpoint + f"?apiKey={self.api_key}"
 
         self.logger = logging.getLogger(__name__)
