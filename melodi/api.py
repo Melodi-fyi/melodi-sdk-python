@@ -5,10 +5,13 @@ import re
 from typing import Optional
 
 import requests
+from pydantic.tools import parse_obj_as
+from requests.models import Response
 
 from .data_models import (BakeoffSample, BinarySample, Comparisons, Feedback,
-                          FeedbackSample, IssueLogAssociation, Item, Samples,
-                          Thread, ThreadResponse, User, UserFeedback)
+                          FeedbackSample, IntentLogAssociation,
+                          IssueLogAssociation, Item, Log, Samples, Thread,
+                          ThreadResponse, User, UserFeedback)
 from .exceptions import MelodiAPIError
 
 
@@ -41,11 +44,16 @@ class MelodiClient:
             self.create_feedback_base_endpoint + f"?apiKey={self.api_key}"
         )
 
+        self.logs_base_endpoint = self.base_url + "/api/external/logs"
+
         self.threads_base_endpoint = self.base_url + "/api/external/threads"
         self.threads_endpoint = self.threads_base_endpoint + f"?apiKey={self.api_key}"
 
         self.issue_log_associations_base_endpoint = self.base_url + "/api/external/issue-log-associations"
         self.issue_log_associations_endpoint = self.issue_log_associations_base_endpoint + f"?apiKey={self.api_key}"
+
+        self.intent_log_associations_base_endpoint = self.base_url + "/api/external/intent-log-associations"
+        self.intent_log_associations_endpoint = self.intent_log_associations_base_endpoint + f"?apiKey={self.api_key}"
 
         self.logger = logging.getLogger(__name__)
 
@@ -57,6 +65,16 @@ class MelodiClient:
     @staticmethod
     def _get_headers():
         return {"Content-Type": "application/json"}
+
+    def _log_melodi_http_errors(self, response: Response):
+        if (response.status_code == 400):
+            try:
+                responseJson = response.json()
+                if (responseJson["errors"]):
+                    for error in responseJson["errors"]:
+                        self.logger.error(f"Bad Request response from Melodi API: {error}")
+            except:
+                pass
 
     def _send_create_experiment_request(self, request_data):
         response = None
@@ -295,8 +313,21 @@ class MelodiClient:
             response = requests.post(
                 url, headers=self._get_headers(), json=thread.dict()
             )
+            self._log_melodi_http_errors(response)
             response.raise_for_status()
-            return response.json()
+            return parse_obj_as(Thread, response.json())
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)
+
+    def get_log(self, log_id: int) -> Log:
+        url = f"{self.logs_base_endpoint}/{log_id}?apiKey={self.api_key}"
+
+        try:
+            response = requests.request("GET", url)
+
+            self._log_melodi_http_errors(response)
+            response.raise_for_status()
+            return parse_obj_as(Log, response.json())
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
@@ -307,7 +338,69 @@ class MelodiClient:
             response = requests.post(
                 url, headers=self._get_headers(), json={"issueId": issue_id, "logId": log_id}
             )
+
+            self._log_melodi_http_errors(response)
             response.raise_for_status()
             return response.json()
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)
+
+    def remove_issue_from_log(self, issue_id: int, log_id: int) -> None:
+        log = self.get_log(log_id)
+
+        for issue_association in log.issueAssociations:
+            if (issue_association.issueId == issue_id):
+                issue_log_association_id = issue_association.id
+                break
+
+        if not issue_log_association_id:
+            raise MelodiAPIError(f"Issue {issue_id} is not associated to log {log_id}")
+
+        url = f"{self.issue_log_associations_base_endpoint}/{issue_log_association_id}?apiKey={self.api_key}"
+
+        try:
+            response = requests.delete(
+                url, headers=self._get_headers()
+            )
+
+            self._log_melodi_http_errors(response)
+            response.raise_for_status()
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)
+
+    def add_intent_to_log(self, intent_id: int, log_id: int) -> IntentLogAssociation:
+        url = self.intent_log_associations_endpoint
+
+        try:
+            response = requests.post(
+                url, headers=self._get_headers(), json={"intentId": intent_id, "logId": log_id}
+            )
+
+            self._log_melodi_http_errors(response)
+            response.raise_for_status()
+            return response.json()
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)
+
+    def remove_intent_from_log(self, intent_id: int, log_id: int) -> None:
+        log = self.get_log(log_id)
+
+        for intent_association in log.intentAssociations:
+            if (intent_association.intentId == intent_id):
+                intent_log_association_id = intent_association.id
+                break
+
+        if not intent_log_association_id:
+            raise MelodiAPIError(f"Intent {intent_id} is not associated to log {log_id}")
+
+        url = f"{self.intent_log_associations_base_endpoint}/{intent_log_association_id}?apiKey={self.api_key}"
+
+        try:
+            response = requests.delete(
+                url, headers=self._get_headers()
+            )
+
+            self._log_melodi_http_errors(response)
+            response.raise_for_status()
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
