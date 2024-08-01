@@ -1,6 +1,6 @@
 from typing import Dict, List, Literal, Optional, Union
 
-from pydantic import BaseModel, EmailStr, Json
+from pydantic import BaseModel, EmailStr, Field, Json
 
 
 class Sample(BaseModel):
@@ -90,7 +90,7 @@ class LogInput(BaseModel):
   id: int
   type: Literal['json', 'markdown', 'messages']
 
-  json: Optional[Json] = None
+  jsonInput: Optional[Json] = Field(..., alias='json')
   markdown: Optional[str] = None
   messages: List[Message] = []
 
@@ -99,7 +99,7 @@ class LogOutput(BaseModel):
 
   type: Literal['json', 'markdown', 'message']
 
-  json: Optional[Json] = None
+  jsonOutput: Optional[Json] = Field(..., alias='json')
   markdown: Optional[str] = None
   messages: Optional[Message] = None
 
