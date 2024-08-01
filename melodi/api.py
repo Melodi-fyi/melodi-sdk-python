@@ -6,6 +6,7 @@ from typing import Optional
 
 import requests
 from pydantic.tools import parse_obj_as
+from requests.models import Response
 
 from .data_models import (BakeoffSample, BinarySample, Comparisons, Feedback,
                           FeedbackSample, IntentLogAssociation,
@@ -64,6 +65,16 @@ class MelodiClient:
     @staticmethod
     def _get_headers():
         return {"Content-Type": "application/json"}
+
+    def _log_melodi_http_errors(self, response: Response):
+        if (response.status_code == 400):
+            try:
+                responseJson = response.json()
+                if (responseJson["errors"]):
+                    for error in responseJson["errors"]:
+                        self.logger.error(f"Bad Request response from Melodi API: {error}")
+            except:
+                pass
 
     def _send_create_experiment_request(self, request_data):
         response = None
@@ -302,6 +313,7 @@ class MelodiClient:
             response = requests.post(
                 url, headers=self._get_headers(), json=thread.dict()
             )
+            self._log_melodi_http_errors(response)
             response.raise_for_status()
             return parse_obj_as(Thread, response.json())
         except MelodiAPIError as e:
@@ -313,6 +325,7 @@ class MelodiClient:
         try:
             response = requests.request("GET", url)
 
+            self._log_melodi_http_errors(response)
             response.raise_for_status()
             return parse_obj_as(Log, response.json())
         except MelodiAPIError as e:
@@ -325,6 +338,8 @@ class MelodiClient:
             response = requests.post(
                 url, headers=self._get_headers(), json={"issueId": issue_id, "logId": log_id}
             )
+
+            self._log_melodi_http_errors(response)
             response.raise_for_status()
             return response.json()
         except MelodiAPIError as e:
@@ -347,6 +362,8 @@ class MelodiClient:
             response = requests.delete(
                 url, headers=self._get_headers()
             )
+
+            self._log_melodi_http_errors(response)
             response.raise_for_status()
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
@@ -358,6 +375,8 @@ class MelodiClient:
             response = requests.post(
                 url, headers=self._get_headers(), json={"intentId": intent_id, "logId": log_id}
             )
+
+            self._log_melodi_http_errors(response)
             response.raise_for_status()
             return response.json()
         except MelodiAPIError as e:
@@ -380,6 +399,8 @@ class MelodiClient:
             response = requests.delete(
                 url, headers=self._get_headers()
             )
+
+            self._log_melodi_http_errors(response)
             response.raise_for_status()
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
