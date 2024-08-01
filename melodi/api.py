@@ -369,7 +369,7 @@ class MelodiClient:
             raise MelodiAPIError(e)
 
     def add_intent_to_log(self, intent_id: int, log_id: int) -> IntentLogAssociation:
-        url = self.issue_log_associations_endpoint
+        url = self.intent_log_associations_endpoint
 
         try:
             response = requests.post(
