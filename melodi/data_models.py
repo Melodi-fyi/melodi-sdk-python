@@ -24,19 +24,16 @@ class BinarySample(BaseModel):
     response: str
     title: Optional[str] = None
 
-
 class BakeoffSample(BaseModel):
     version: str
     response: str
     message: Optional[str] = None
     title: Optional[str] = None
 
-
 class Item(BaseModel):
     projectName: str
     versionName: str
     data: Dict
-
 
 class FeedbackSample(BaseModel):
     project: str
@@ -45,11 +42,9 @@ class FeedbackSample(BaseModel):
     output: str
     metadata: Dict
 
-
 class Feedback(BaseModel):
     feedbackType: str
     feedbackText: str
-
 
 class User(BaseModel):
     id: str
@@ -86,39 +81,47 @@ class IntentLogAssociation(BaseModel):
     intentId: int
     logId: int
     userId: int
-class LogInput(BaseModel):
-  id: int
-  type: Literal['json', 'markdown', 'messages']
 
-  jsonInput: Optional[Json] = Field(..., alias='json')
-  markdown: Optional[str] = None
-  messages: List[Message] = []
+class LogInput(BaseModel):
+    type: Literal['json', 'markdown', 'messages']
+
+    jsonInput: Optional[Json] = Field(default=None, alias='json')
+    markdown: Optional[str] = None
+    messages: List[Message] = []
+
+class LogInputResponse(LogInput):
+    id: int
 
 class LogOutput(BaseModel):
-  id: int
+    type: Literal['json', 'markdown', 'message']
 
-  type: Literal['json', 'markdown', 'message']
+    jsonOutput: Optional[Json] = Field(default=None, alias='json')
+    markdown: Optional[str] = None
+    message: Optional[Message] = None
 
-  jsonOutput: Optional[Json] = Field(..., alias='json')
-  markdown: Optional[str] = None
-  messages: Optional[Message] = None
+class LogOutputResponse(LogOutput):
+    id: int
 
 class Log(BaseModel):
-  id: int
-  organizationId: int
-  projectId: int
+    projectId: int
 
-  externalId: Optional[str] = None
+    externalId: Optional[str] = None
+    externalThreadId: Optional[str] = None
 
-  input: Optional[LogInput]
-  output: LogOutput
+    input: Optional[LogInput]
+    output: LogOutput
 
-  thread: Optional[ThreadResponse] = None
+    externalUser: Optional[User] = None
 
-  externalUser:   Optional[User] = None
+    metadata: dict[str, Union[str, int]] = {}
 
-  metadata: dict[str, Union[str, int]] = {}
+class LogResponse(Log):
+    id: int
 
-  issueAssociations: List[IssueLogAssociation]
-  intentAssociations: List[IntentLogAssociation]
+    input: Optional[LogInputResponse] = None
+    output: Optional[LogOutputResponse] = None
 
+    thread: Optional[ThreadResponse] = None
+
+    issueAssociations: List[IssueLogAssociation] = []
+    intentAssociations: List[IntentLogAssociation] = []
