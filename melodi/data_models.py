@@ -56,6 +56,7 @@ class UserFeedback(BaseModel):
     user: User
 
 class Message(BaseModel):
+    externalId: Optional[str] = None
     role: str
     content: str
     metadata: dict[str, Union[str, int]] = {}
