@@ -10,8 +10,8 @@ from requests.models import Response
 
 from .data_models import (BakeoffSample, BinarySample, Comparisons, Feedback,
                           FeedbackSample, IntentLogAssociation,
-                          IssueLogAssociation, Item, Log, Samples, Thread,
-                          ThreadResponse, User, UserFeedback)
+                          IssueLogAssociation, Item, Log, LogResponse, Samples,
+                          Thread, ThreadResponse, User, UserFeedback)
 from .exceptions import MelodiAPIError
 
 
@@ -34,9 +34,6 @@ class MelodiClient:
             self.experiments_base_endpoint + f"?apiKey={self.api_key}"
         )
 
-        self.log_item_base_endpoint = self.base_url + "/api/external/logs"
-        self.log_item_endpoint = self.log_item_base_endpoint + f"?apiKey={self.api_key}"
-
         self.create_feedback_base_endpoint = (
             self.base_url + "/api/external/feedback"
         )
@@ -45,6 +42,7 @@ class MelodiClient:
         )
 
         self.logs_base_endpoint = self.base_url + "/api/external/logs"
+        self.logs_endpont = self.logs_base_endpoint + f"?apiKey={self.api_key}"
 
         self.threads_base_endpoint = self.base_url + "/api/external/threads"
         self.threads_endpoint = self.threads_base_endpoint + f"?apiKey={self.api_key}"
@@ -203,15 +201,19 @@ class MelodiClient:
 
         return self._send_create_experiment_request(request_data=request_data)
 
-    def create_log(self, item: Item):
-        res = requests.request(
-            "POST",
-            url=self.log_item_endpoint,
-            json=item.dict(),
-            headers=self._get_headers(),
-        )
+    def create_log(self, log: Log) -> LogResponse:
+        try:
+            response = requests.post(
+                self.logs_endpont,
+                headers=self._get_headers(),
+                json=log.dict(),
+            )
 
-        return res
+            self._log_melodi_http_errors(response)
+            response.raise_for_status()
+            return parse_obj_as(LogResponse, response.json())
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)
 
     def create_feedback(self, sample: FeedbackSample, feedback: Feedback, user: User):
         user_feedback = UserFeedback(sample=sample, feedback=feedback, user=user)
@@ -319,7 +321,7 @@ class MelodiClient:
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
-    def get_log(self, log_id: int) -> Log:
+    def get_log(self, log_id: int) -> LogResponse:
         url = f"{self.logs_base_endpoint}/{log_id}?apiKey={self.api_key}"
 
         try:
@@ -327,7 +329,7 @@ class MelodiClient:
 
             self._log_melodi_http_errors(response)
             response.raise_for_status()
-            return parse_obj_as(Log, response.json())
+            return parse_obj_as(LogResponse, response.json())
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
