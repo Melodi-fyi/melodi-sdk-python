@@ -55,6 +55,11 @@ class UserFeedback(BaseModel):
     feedback: Feedback
     user: User
 
+class ExternalUser(BaseModel):
+    externalId: str
+    email: Optional[EmailStr] = None
+    name: Optional[str] = None
+
 class Message(BaseModel):
     externalId: Optional[str] = None
     role: str
@@ -66,7 +71,7 @@ class Thread(BaseModel):
     projectId: int
     messages: List[Message]
     metadata: dict[str, Union[str, int]] = {}
-    externalUser: Optional[User] = None
+    externalUser: Optional[ExternalUser] = None
 
 class ThreadResponse(Thread):
     id: int
@@ -112,7 +117,7 @@ class Log(BaseModel):
     input: Optional[LogInput]
     output: LogOutput
 
-    externalUser: Optional[User] = None
+    externalUser: Optional[ExternalUser] = None
 
     metadata: dict[str, Union[str, int]] = {}
 

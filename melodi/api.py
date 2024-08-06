@@ -206,7 +206,7 @@ class MelodiClient:
             response = requests.post(
                 self.logs_endpont,
                 headers=self._get_headers(),
-                json=log.dict(),
+                json=log.model_dump(),
             )
 
             self._log_melodi_http_errors(response)
@@ -221,7 +221,7 @@ class MelodiClient:
         res = requests.request(
             "POST",
             url=self.create_feedback_endpoint,
-            json=user_feedback.dict(),
+            json=user_feedback.model_dump(),
             headers=self._get_headers(),
         )
 
@@ -273,7 +273,7 @@ class MelodiClient:
         endpoint = f"{self.experiments_base_endpoint}/{experiment_id}/samples?apiKey={self.api_key}"
 
         try:
-            response = requests.post(endpoint, json=sample.dict())
+            response = requests.post(endpoint, json=sample.model_dump())
             response.raise_for_status()
             return response
         except MelodiAPIError as e:
@@ -285,7 +285,7 @@ class MelodiClient:
         sample_1: BakeoffSample,
         sample_2: BakeoffSample,
     ) -> None:
-        comparison = {"samples": [sample_1.dict(), sample_2.dict()]}
+        comparison = {"samples": [sample_1.model_dump(), sample_2.model_dump()]}
         endpoint = f"{self.experiments_base_endpoint}/{experiment_id}/comparisons?apiKey={self.api_key}"
 
         try:
@@ -313,7 +313,7 @@ class MelodiClient:
 
         try:
             response = requests.post(
-                url, headers=self._get_headers(), json=thread.dict()
+                url, headers=self._get_headers(), json=thread.model_dump()
             )
             self._log_melodi_http_errors(response)
             response.raise_for_status()
