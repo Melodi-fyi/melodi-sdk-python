@@ -93,7 +93,7 @@ class LogInput(BaseModel):
 
     jsonInput: Optional[Json] = Field(default=None, alias='json')
     markdown: Optional[str] = None
-    messages: List[Message] = []
+    messages: Optional[List[Message]] = None
 
 class LogInputResponse(LogInput):
     id: int
