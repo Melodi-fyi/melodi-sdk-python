@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, EmailStr, Field, Json
@@ -34,26 +35,6 @@ class Item(BaseModel):
     projectName: str
     versionName: str
     data: Dict
-
-class FeedbackSample(BaseModel):
-    project: str
-    projectVersion: str
-    input: str
-    output: str
-    metadata: Dict
-
-class Feedback(BaseModel):
-    feedbackType: str
-    feedbackText: str
-
-class User(BaseModel):
-    id: str
-    email: Optional[EmailStr] = None
-
-class UserFeedback(BaseModel):
-    sample: FeedbackSample
-    feedback: Feedback
-    user: User
 
 class ExternalUser(BaseModel):
     externalId: str
@@ -131,3 +112,24 @@ class LogResponse(Log):
 
     issueAssociations: List[IssueLogAssociation] = []
     intentAssociations: List[IntentLogAssociation] = []
+
+class Feedback(BaseModel):
+    externalLogId: Optional[str] = None
+
+    externalThreadId: Optional[str] = None
+    externalMessageId: Optional[str] = None
+
+    feedbackType: Literal['POSITIVE', 'NEGATIVE']
+    feedbackText: Optional[str] = None
+
+    externalUser: Optional[ExternalUser] = None
+
+class FeedbackResponse(Feedback):
+    id: int
+    feedbackType: Literal['POSITIVE', 'NEGATIVE']
+    feedbackText: Optional[str] = None
+    isDeleted: bool
+    externalUserId: Optional[int] = None
+    logId: int
+    createdAt: datetime
+    updatedAt: datetime
