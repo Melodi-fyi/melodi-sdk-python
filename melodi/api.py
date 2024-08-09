@@ -9,9 +9,9 @@ from pydantic.tools import parse_obj_as
 from requests.models import Response
 
 from .data_models import (BakeoffSample, BinarySample, Comparisons, Feedback,
-                          FeedbackSample, IntentLogAssociation,
+                          FeedbackResponse, IntentLogAssociation,
                           IssueLogAssociation, Log, LogResponse, Samples,
-                          Thread, ThreadResponse, User, UserFeedback)
+                          Thread, ThreadResponse)
 from .exceptions import MelodiAPIError
 
 
@@ -215,17 +215,21 @@ class MelodiClient:
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
-    def create_feedback(self, sample: FeedbackSample, feedback: Feedback, user: User):
-        user_feedback = UserFeedback(sample=sample, feedback=feedback, user=user)
+    def create_feedback(self, feedback: Feedback) -> FeedbackResponse:
+        try:
+            response = requests.request(
+                "POST",
+                url=self.create_feedback_endpoint,
+                json=feedback.dict(by_alias=True),
+                headers=self._get_headers(),
+            )
 
-        res = requests.request(
-            "POST",
-            url=self.create_feedback_endpoint,
-            json=user_feedback.dict(by_alias=True),
-            headers=self._get_headers(),
-        )
 
-        return res
+            self._log_melodi_http_errors(response)
+            response.raise_for_status()
+            return parse_obj_as(FeedbackResponse, response.json())
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)
 
     def create_binary_evaluation_experiment(
         self,
