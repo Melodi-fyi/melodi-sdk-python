@@ -119,6 +119,8 @@ class Feedback(BaseModel):
     externalThreadId: Optional[str] = None
     externalMessageId: Optional[str] = None
 
+    log: Optional[Log] = None
+
     feedbackType: Literal['POSITIVE', 'NEGATIVE']
     feedbackText: Optional[str] = None
 
