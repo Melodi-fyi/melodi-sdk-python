@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import re
-from typing import Optional
+from typing import List, Optional
 
 import requests
 from pydantic.tools import parse_obj_as
@@ -10,8 +10,8 @@ from requests.models import Response
 
 from .data_models import (BakeoffSample, BinarySample, Comparisons, Feedback,
                           FeedbackResponse, IntentLogAssociation,
-                          IssueLogAssociation, Log, LogResponse, Samples,
-                          Thread, ThreadResponse)
+                          IssueLogAssociation, Log, LogResponse,
+                          ProjectResponse, Samples, Thread, ThreadResponse)
 from .exceptions import MelodiAPIError
 
 
@@ -52,6 +52,9 @@ class MelodiClient:
 
         self.intent_log_associations_base_endpoint = self.base_url + "/api/external/intent-log-associations"
         self.intent_log_associations_endpoint = self.intent_log_associations_base_endpoint + f"?apiKey={self.api_key}"
+
+        self.projects_base_endpoint = self.base_url + "/api/external/projects"
+        self.projects_endpoint = self.projects_base_endpoint + f"?apiKey={self.api_key}"
 
         self.logger = logging.getLogger(__name__)
 
@@ -408,5 +411,16 @@ class MelodiClient:
 
             self._log_melodi_http_errors(response)
             response.raise_for_status()
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)
+
+    def list_projects(self) -> List[ProjectResponse]:
+        try:
+            response = requests.request("GET", self.projects_endpoint)
+
+            self._log_melodi_http_errors(response)
+            response.raise_for_status()
+
+            return parse_obj_as(List[ProjectResponse], response.json())
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
