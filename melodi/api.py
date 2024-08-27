@@ -11,7 +11,8 @@ from requests.models import Response
 from .data_models import (BakeoffSample, BinarySample, Comparisons, Feedback,
                           FeedbackResponse, IntentLogAssociation,
                           IssueLogAssociation, Log, LogResponse,
-                          ProjectResponse, Samples, Thread, ThreadResponse)
+                          ProjectResponse, Samples, Thread, ThreadResponse,
+                          ThreadsPagedResponse, ThreadsQueryParams)
 from .exceptions import MelodiAPIError
 
 
@@ -325,6 +326,26 @@ class MelodiClient:
             self._log_melodi_http_errors(response)
             response.raise_for_status()
             return parse_obj_as(Thread, response.json())
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)
+
+    def get_threads_paged(self, query_params: ThreadsQueryParams = ThreadsQueryParams()) -> ThreadsPagedResponse:
+        url = f"{self.threads_endpoint}&pageIndex={query_params.pageIndex}&pageSize={query_params.pageSize}"
+
+        if (query_params.projectId):
+            url = f"{url}&projectId={query_params.projectId}"
+        if (query_params.before):
+            url = f"{url}&before={query_params.before.isoformat()}"
+        if (query_params.after):
+            url = f"{url}&after={query_params.after.isoformat()}"
+
+        try:
+            response = requests.request("GET", url)
+
+            self._log_melodi_http_errors(response)
+            response.raise_for_status()
+
+            return parse_obj_as(ThreadsPagedResponse, response.json())
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
