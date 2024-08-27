@@ -95,7 +95,7 @@ class Log(BaseModel):
     externalId: Optional[str] = None
     externalThreadId: Optional[str] = None
 
-    input: Optional[LogInput]
+    input: Optional[LogInput] = None
     output: LogOutput
 
     externalUser: Optional[ExternalUser] = None
