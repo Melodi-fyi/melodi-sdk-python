@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, EmailStr, Field, Json
 
@@ -43,8 +43,10 @@ class ExternalUser(BaseModel):
 
 class Message(BaseModel):
     externalId: Optional[str] = None
+    type: Literal['markdown', 'json'] = 'markdown'
     role: str
-    content: str
+    content: Optional[str] = None
+    jsonContent: Optional[Any] = None
     metadata: dict[str, Union[str, int]] = {}
 
 class Thread(BaseModel):
