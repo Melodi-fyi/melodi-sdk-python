@@ -59,6 +59,17 @@ class Thread(BaseModel):
 class ThreadResponse(Thread):
     id: int
 
+class ThreadsPagedResponse(BaseModel):
+    count: int
+    rows: List[ThreadResponse]
+
+class ThreadsQueryParams(BaseModel):
+  pageSize: int = 50
+  pageIndex: int = 0
+  projectId: Optional[int] = None
+  before: Optional[datetime] = None
+  after: Optional[datetime] = None
+
 class IssueLogAssociation(BaseModel):
     id: int
     issueId: int
