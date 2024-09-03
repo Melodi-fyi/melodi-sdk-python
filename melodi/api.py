@@ -329,6 +329,19 @@ class MelodiClient:
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
+    def create_or_update_thread(self, thread: Thread) -> ThreadResponse:
+        url = self.threads_endpoint
+
+        try:
+            response = requests.put(
+                url, headers=self._get_headers(), json=thread.dict(by_alias=True)
+            )
+            self._log_melodi_http_errors(response)
+            response.raise_for_status()
+            return parse_obj_as(Thread, response.json())
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)
+
     def get_threads_paged(self, query_params: ThreadsQueryParams = ThreadsQueryParams()) -> ThreadsPagedResponse:
         url = f"{self.threads_endpoint}&pageIndex={query_params.pageIndex}&pageSize={query_params.pageSize}"
 
