@@ -459,6 +459,23 @@ class MelodiClient:
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
+    def get_project_by_name(self, name: str) -> ProjectResponse:
+        try:
+            response = requests.request("GET", f"{self.projects_endpoint}&name={name}")
+
+            self._log_melodi_http_errors(response)
+            response.raise_for_status()
+
+            projects = parse_obj_as(List[ProjectResponse], response.json())
+
+            if (len(projects) > 0):
+                return projects[0]
+            else:
+                return None
+
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)
+
     def create_project(self, name: str) -> ProjectResponse:
         url = self.projects_endpoint
 
