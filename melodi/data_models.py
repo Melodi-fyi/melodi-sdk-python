@@ -73,14 +73,31 @@ class ThreadsQueryParams(BaseModel):
 class IssueLogAssociation(BaseModel):
     id: int
     issueId: int
-    logId: int
+    messageId: int
     userId: int
 
 class IntentLogAssociation(BaseModel):
     id: int
     intentId: int
-    logId: int
+    messageId: int
     userId: int
+
+class IssueMessageAssociation(BaseModel):
+    id: int
+    issueId: int
+    messageId: int
+    userId: int
+
+class IntentMessageAssociation(BaseModel):
+    id: int
+    intentId: int
+    messageId: int
+    userId: int
+
+class MessageResponse(Message):
+    id: int
+    issueAssociations: List[IssueMessageAssociation]
+    intentAssociations: List[IntentMessageAssociation]
 
 class LogInput(BaseModel):
     type: Literal['json', 'markdown', 'messages']
