@@ -49,6 +49,9 @@ class Message(BaseModel):
     jsonContent: Optional[Any] = None
     metadata: dict[str, Union[str, int]] = {}
 
+class MessageResponse(Message):
+    id: int
+
 class Thread(BaseModel):
     externalId: Optional[str] = None
     projectId: int

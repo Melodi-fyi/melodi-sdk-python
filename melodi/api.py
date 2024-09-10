@@ -10,7 +10,7 @@ from requests.models import Response
 
 from .data_models import (BakeoffSample, BinarySample, Comparisons, Feedback,
                           FeedbackResponse, IntentMessageAssociation,
-                          IssueMessageAssociation, Log, LogResponse,
+                          IssueMessageAssociation, Log, LogResponse, MessageResponse,
                           ProjectResponse, Samples, Thread, ThreadResponse,
                           ThreadsPagedResponse, ThreadsQueryParams)
 from .exceptions import MelodiAPIError
@@ -47,6 +47,9 @@ class MelodiClient:
 
         self.threads_base_endpoint = self.base_url + "/api/external/threads"
         self.threads_endpoint = self.threads_base_endpoint + f"?apiKey={self.api_key}"
+
+        self.messages_base_endpoint = self.base_url + "/api/external/messages"
+        self.messages_endpoint = self.messages_base_endpoint + f"?apiKey={self.api_key}"
 
         self.issue_message_associations_base_endpoint = self.base_url + "/api/external/issue-message-associations"
         self.issue_message_associations_endpoint = self.issue_message_associations_base_endpoint + f"?apiKey={self.api_key}"
@@ -371,6 +374,18 @@ class MelodiClient:
             self._log_melodi_http_errors(response)
             response.raise_for_status()
             return parse_obj_as(LogResponse, response.json())
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)
+
+    def get_message(self, message_id: int) -> LogResponse:
+        url = f"{self.messages_base_endpoint}/{message_id}?apiKey={self.api_key}"
+
+        try:
+            response = requests.request("GET", url)
+
+            self._log_melodi_http_errors(response)
+            response.raise_for_status()
+            return parse_obj_as(MessageResponse, response.json())
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
