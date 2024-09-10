@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import Any, Dict, List, Literal, Optional, Union
 
-from pydantic import BaseModel, EmailStr, Field, Json
+from pydantic import (BaseModel, EmailStr, Field, Json, ValidationError,
+                      root_validator)
 
 
 class Sample(BaseModel):
@@ -51,10 +52,18 @@ class Message(BaseModel):
 
 class Thread(BaseModel):
     externalId: Optional[str] = None
-    projectId: int
+    projectId: Optional[int] = None
+    projectName: Optional[str] = None
     messages: List[Message]
     metadata: dict[str, Union[str, int]] = {}
     externalUser: Optional[ExternalUser] = None
+
+    @root_validator
+    def validate_gpa_and_fees(cls, values):
+        projectId = values.get('projectId')
+        projectName = values.get('projectName')
+        assert projectId or projectName, "Must include projectId or projectName"
+        return values
 
 class ThreadResponse(Thread):
     id: int
