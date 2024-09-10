@@ -49,9 +49,6 @@ class Message(BaseModel):
     jsonContent: Optional[Any] = None
     metadata: dict[str, Union[str, int]] = {}
 
-class MessageResponse(Message):
-    id: int
-
 class Thread(BaseModel):
     externalId: Optional[str] = None
     projectId: int
@@ -73,6 +70,18 @@ class ThreadsQueryParams(BaseModel):
   before: Optional[datetime] = None
   after: Optional[datetime] = None
 
+class IssueLogAssociation(BaseModel):
+    id: int
+    issueId: int
+    messageId: int
+    userId: int
+
+class IntentLogAssociation(BaseModel):
+    id: int
+    intentId: int
+    messageId: int
+    userId: int
+
 class IssueMessageAssociation(BaseModel):
     id: int
     issueId: int
@@ -84,6 +93,11 @@ class IntentMessageAssociation(BaseModel):
     intentId: int
     messageId: int
     userId: int
+
+class MessageResponse(Message):
+    id: int
+    issueAssociations: List[IssueMessageAssociation]
+    intentAssociations: List[IntentMessageAssociation]
 
 class LogInput(BaseModel):
     type: Literal['json', 'markdown', 'messages']
