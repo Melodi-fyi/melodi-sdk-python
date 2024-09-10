@@ -9,8 +9,8 @@ from pydantic.tools import parse_obj_as
 from requests.models import Response
 
 from .data_models import (BakeoffSample, BinarySample, Comparisons, Feedback,
-                          FeedbackResponse, IntentLogAssociation,
-                          IssueLogAssociation, Log, LogResponse,
+                          FeedbackResponse, IntentMessageAssociation,
+                          IssueMessageAssociation, Log, LogResponse,
                           ProjectResponse, Samples, Thread, ThreadResponse,
                           ThreadsPagedResponse, ThreadsQueryParams)
 from .exceptions import MelodiAPIError
@@ -48,11 +48,11 @@ class MelodiClient:
         self.threads_base_endpoint = self.base_url + "/api/external/threads"
         self.threads_endpoint = self.threads_base_endpoint + f"?apiKey={self.api_key}"
 
-        self.issue_log_associations_base_endpoint = self.base_url + "/api/external/issue-log-associations"
-        self.issue_log_associations_endpoint = self.issue_log_associations_base_endpoint + f"?apiKey={self.api_key}"
+        self.issue_message_associations_base_endpoint = self.base_url + "/api/external/issue-message-associations"
+        self.issue_message_associations_endpoint = self.issue_message_associations_base_endpoint + f"?apiKey={self.api_key}"
 
-        self.intent_log_associations_base_endpoint = self.base_url + "/api/external/intent-log-associations"
-        self.intent_log_associations_endpoint = self.intent_log_associations_base_endpoint + f"?apiKey={self.api_key}"
+        self.intent_message_associations_base_endpoint = self.base_url + "/api/external/intent-message-associations"
+        self.intent_message_associations_endpoint = self.intent_message_associations_base_endpoint + f"?apiKey={self.api_key}"
 
         self.projects_base_endpoint = self.base_url + "/api/external/projects"
         self.projects_endpoint = self.projects_base_endpoint + f"?apiKey={self.api_key}"
@@ -374,12 +374,12 @@ class MelodiClient:
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
-    def add_issue_to_log(self, issue_id: int, log_id: int) -> IssueLogAssociation:
-        url = self.issue_log_associations_endpoint
+    def add_issue_to_message(self, issue_id: int, message_id: int) -> IssueMessageAssociation:
+        url = self.issue_message_associations_endpoint
 
         try:
             response = requests.post(
-                url, headers=self._get_headers(), json={"issueId": issue_id, "logId": log_id}
+                url, headers=self._get_headers(), json={"issueId": issue_id, "messageId": message_id}
             )
 
             self._log_melodi_http_errors(response)
@@ -388,7 +388,7 @@ class MelodiClient:
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
-    def remove_issue_from_log(self, issue_id: int, log_id: int) -> None:
+    def remove_issue_from_message(self, issue_id: int, log_id: int) -> None:
         log = self.get_log(log_id)
 
         for issue_association in log.issueAssociations:
@@ -411,12 +411,12 @@ class MelodiClient:
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
-    def add_intent_to_log(self, intent_id: int, log_id: int) -> IntentLogAssociation:
-        url = self.intent_log_associations_endpoint
+    def add_intent_to_log(self, intent_id: int, message_id: int) -> IntentMessageAssociation:
+        url = self.intent_message_associations_endpoint
 
         try:
             response = requests.post(
-                url, headers=self._get_headers(), json={"intentId": intent_id, "logId": log_id}
+                url, headers=self._get_headers(), json={"intentId": intent_id, "messageId": message_id}
             )
 
             self._log_melodi_http_errors(response)

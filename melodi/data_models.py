@@ -70,16 +70,16 @@ class ThreadsQueryParams(BaseModel):
   before: Optional[datetime] = None
   after: Optional[datetime] = None
 
-class IssueLogAssociation(BaseModel):
+class IssueMessageAssociation(BaseModel):
     id: int
     issueId: int
-    logId: int
+    messageId: int
     userId: int
 
-class IntentLogAssociation(BaseModel):
+class IntentMessageAssociation(BaseModel):
     id: int
     intentId: int
-    logId: int
+    messageId: int
     userId: int
 
 class LogInput(BaseModel):
