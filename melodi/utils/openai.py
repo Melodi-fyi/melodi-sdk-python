@@ -1,5 +1,33 @@
-from ..data_models import ExternalUser, Log, LogInput, LogOutput, Message
+from ..data_models import (ExternalUser, Log, LogInput, LogOutput, Message,
+                           Thread)
 
+
+def thread_object_from_open_ai_messages_response(messages_response, project_id: int, external_user: ExternalUser = None, metadata: dict = {}) -> Log:
+  messages = messages_response.data
+
+  melodi_messages = []
+  for index, message in enumerate(messages):
+    if (index == 0):
+      thread_id = message.thread_id
+    melodi_messages.append(
+        Message(
+            externalId=message.id,
+            role=message.role,
+            content=message.content[0].text.value,
+        )
+    )
+
+  melodi_messages.reverse()
+
+  thread = Thread(
+      projectId=project_id,
+      externalId=thread_id,
+      messages=melodi_messages,
+      metadata=metadata,
+      externalUser=external_user,
+  )
+
+  return thread
 
 def log_object_from_open_ai_messages_response(messages_response, project_id: int, external_user: ExternalUser = None, metadata: dict = {}) -> Log:
   messages = messages_response.data
@@ -24,6 +52,7 @@ def log_object_from_open_ai_messages_response(messages_response, project_id: int
 
   log = Log(
       projectId=project_id,
+      externalId=thread_id,
       externalThreadId=thread_id,
 
       input=LogInput(
