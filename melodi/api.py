@@ -10,9 +10,10 @@ from requests.models import Response
 
 from .data_models import (BakeoffSample, BinarySample, Comparisons, Feedback,
                           FeedbackResponse, IntentMessageAssociation,
-                          IssueMessageAssociation, Log, LogResponse, MessageResponse,
-                          ProjectResponse, Samples, Thread, ThreadResponse,
-                          ThreadsPagedResponse, ThreadsQueryParams)
+                          IssueMessageAssociation, Log, LogResponse,
+                          MessageResponse, ProjectResponse, Samples, Thread,
+                          ThreadResponse, ThreadsPagedResponse,
+                          ThreadsQueryParams)
 from .exceptions import MelodiAPIError
 
 
