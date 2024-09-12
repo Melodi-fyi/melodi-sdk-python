@@ -171,7 +171,7 @@ class FeedbackResponse(Feedback):
     feedbackText: Optional[str] = None
     isDeleted: bool
     externalUserId: Optional[int] = None
-    logId: int
+    logId: Optional[int] = None
     createdAt: datetime
     updatedAt: datetime
 

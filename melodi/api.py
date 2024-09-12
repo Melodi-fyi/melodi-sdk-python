@@ -232,7 +232,6 @@ class MelodiClient:
                 headers=self._get_headers(),
             )
 
-
             self._log_melodi_http_errors(response)
             response.raise_for_status()
             return parse_obj_as(FeedbackResponse, response.json())
