@@ -52,7 +52,6 @@ def log_object_from_open_ai_messages_response(messages_response, project_id: int
 
   log = Log(
       projectId=project_id,
-      externalId=thread_id,
       externalThreadId=thread_id,
 
       input=LogInput(
