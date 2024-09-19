@@ -67,6 +67,8 @@ class Thread(BaseModel):
 
 class ThreadResponse(Thread):
     id: int
+    createdAt: datetime
+    updatedAt: datetime
 
 class ThreadsPagedResponse(BaseModel):
     count: int
