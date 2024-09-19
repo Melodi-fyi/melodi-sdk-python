@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Dict, List, Literal, Optional, Union
 
-from pydantic import (BaseModel, EmailStr, Field, Json, ValidationError,
+from pydantic import (BaseModel, ConfigDict, EmailStr, Extra, Field, Json,
                       root_validator)
 
 
@@ -75,6 +75,9 @@ class ThreadsPagedResponse(BaseModel):
     rows: List[ThreadResponse]
 
 class ThreadsQueryParams(BaseModel):
+  class Config:
+    extra = Extra.forbid
+
   pageSize: int = 50
   pageIndex: int = 0
   projectId: Optional[int] = None
