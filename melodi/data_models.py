@@ -52,6 +52,7 @@ class Message(BaseModel):
     metadata: dict[str, Union[str, int]] = {}
 
 class Thread(BaseModel):
+    id: Optional[int] = None
     externalId: Optional[str] = None
     projectId: Optional[int] = None
     projectName: Optional[str] = None
@@ -65,15 +66,6 @@ class Thread(BaseModel):
         projectName = values.get('projectName')
         assert projectId or projectName, "Must include projectId or projectName"
         return values
-
-class ThreadResponse(Thread):
-    id: int
-    createdAt: datetime
-    updatedAt: datetime
-
-class ThreadsPagedResponse(BaseModel):
-    count: int
-    rows: List[ThreadResponse]
 
 class ThreadsQueryParams(BaseModel):
   class Config:
@@ -149,17 +141,6 @@ class Log(BaseModel):
 
     metadata: dict[str, Union[str, int]] = {}
 
-class LogResponse(Log):
-    id: int
-
-    input: Optional[LogInputResponse] = None
-    output: Optional[LogOutputResponse] = None
-
-    thread: Optional[ThreadResponse] = None
-
-    issueAssociations: List[IssueLogAssociation] = []
-    intentAssociations: List[IntentLogAssociation] = []
-
 class Feedback(BaseModel):
     externalLogId: Optional[str] = None
 
@@ -212,3 +193,24 @@ class ExternalUserResponse(BaseModel):
     email: Optional[EmailStr] = None
     name: Optional[str] = None
     segments: List[UserSegmentRespone]
+
+class ThreadResponse(Thread):
+    id: int
+    externalUser: Optional[ExternalUserResponse] = None
+    createdAt: datetime
+    updatedAt: datetime
+
+class ThreadsPagedResponse(BaseModel):
+    count: int
+    rows: List[ThreadResponse]
+
+class LogResponse(Log):
+    id: int
+
+    input: Optional[LogInputResponse] = None
+    output: Optional[LogOutputResponse] = None
+
+    thread: Optional[ThreadResponse] = None
+
+    issueAssociations: List[IssueLogAssociation] = []
+    intentAssociations: List[IntentLogAssociation] = []
