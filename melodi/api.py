@@ -354,6 +354,8 @@ class MelodiClient:
             url = f"{url}&before={query_params.before.isoformat()}"
         if (query_params.after):
             url = f"{url}&after={query_params.after.isoformat()}"
+        if (query_params.search):
+            url = f"{url}&search={query_params.search}"
 
         try:
             response = requests.request("GET", url)
