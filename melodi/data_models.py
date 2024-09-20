@@ -41,6 +41,7 @@ class ExternalUser(BaseModel):
     externalId: str
     email: Optional[EmailStr] = None
     name: Optional[str] = None
+    segments: Optional[dict[str, str]] = {}
 
 class Message(BaseModel):
     externalId: Optional[str] = None
@@ -195,3 +196,19 @@ class ProjectResponse(BaseModel):
     notes: Optional[str] = None
     createdAt: datetime
     updatedAt: datetime
+
+class UserSegmentTypeResponse(BaseModel):
+    id: int
+    name: str
+
+class UserSegmentRespone(BaseModel):
+    id: int
+    type: UserSegmentTypeResponse
+    name: str
+
+class ExternalUserResponse(BaseModel):
+    id: int
+    externalId: str
+    email: Optional[EmailStr] = None
+    name: Optional[str] = None
+    segments: List[UserSegmentRespone]
