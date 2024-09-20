@@ -8,7 +8,7 @@ import requests
 from pydantic.tools import parse_obj_as
 from requests.models import Response
 
-from .data_models import (BakeoffSample, BinarySample, Comparisons, Feedback,
+from .data_models import (BakeoffSample, BinarySample, Comparisons, ExternalUser, ExternalUserResponse, Feedback,
                           FeedbackResponse, IntentMessageAssociation,
                           IssueMessageAssociation, Log, LogResponse,
                           MessageResponse, ProjectResponse, Samples, Thread,
@@ -60,6 +60,8 @@ class MelodiClient:
 
         self.projects_base_endpoint = self.base_url + "/api/external/projects"
         self.projects_endpoint = self.projects_base_endpoint + f"?apiKey={self.api_key}"
+
+        self.external_users_base_endpoint = self.base_url + "/api/external/users"
 
         self.logger = logging.getLogger(__name__)
 
@@ -507,5 +509,19 @@ class MelodiClient:
             self._log_melodi_http_errors(response)
             response.raise_for_status()
             return parse_obj_as(ProjectResponse, response.json())
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)
+
+    def update_external_user(self, external_user: ExternalUser) -> ExternalUser:
+        url = f"{self.external_users_base_endpoint}/{external_user.externalId}?apiKey={self.api_key}"
+
+        try:
+            response = requests.patch(
+                url, headers=self._get_headers(), json=external_user.dict(by_alias=True)
+            )
+
+            self._log_melodi_http_errors(response)
+            response.raise_for_status()
+            return parse_obj_as(ExternalUserResponse, response.json())
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
