@@ -8,7 +8,8 @@ import requests
 from pydantic.tools import parse_obj_as
 from requests.models import Response
 
-from .data_models import (BakeoffSample, BinarySample, Comparisons, ExternalUser, ExternalUserResponse, Feedback,
+from .data_models import (BakeoffSample, BinarySample, Comparisons,
+                          ExternalUser, ExternalUserResponse, Feedback,
                           FeedbackResponse, IntentMessageAssociation,
                           IssueMessageAssociation, Log, LogResponse,
                           MessageResponse, ProjectResponse, Samples, Thread,
@@ -330,7 +331,7 @@ class MelodiClient:
             )
             self._log_melodi_http_errors(response)
             response.raise_for_status()
-            return parse_obj_as(Thread, response.json())
+            return parse_obj_as(ThreadResponse, response.json())
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
@@ -343,7 +344,7 @@ class MelodiClient:
             )
             self._log_melodi_http_errors(response)
             response.raise_for_status()
-            return parse_obj_as(Thread, response.json())
+            return parse_obj_as(ThreadResponse, response.json())
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
