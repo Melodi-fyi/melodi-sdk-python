@@ -81,6 +81,7 @@ class ThreadsQueryParams(BaseModel):
   pageSize: int = 50
   pageIndex: int = 0
   projectId: Optional[int] = None
+  userSegmentIds: Optional[List[int]] = None
   search: Optional[str] = None
   before: Optional[datetime] = None
   after: Optional[datetime] = None

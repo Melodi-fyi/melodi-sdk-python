@@ -356,6 +356,9 @@ class MelodiClient:
             url = f"{url}&after={query_params.after.isoformat()}"
         if (query_params.search):
             url = f"{url}&search={query_params.search}"
+        if (query_params.userSegmentIds):
+            for userSegmentId in query_params.userSegmentIds:
+                url = f"{url}&userSegmentIds={userSegmentId}"
 
         try:
             response = requests.request("GET", url)
