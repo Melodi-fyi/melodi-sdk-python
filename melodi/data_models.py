@@ -149,14 +149,24 @@ class Feedback(BaseModel):
 
     log: Optional[Log] = None
 
-    feedbackType: Literal['POSITIVE', 'NEGATIVE']
+    feedbackType: Optional[Literal['POSITIVE', 'NEGATIVE']] = None
     feedbackText: Optional[str] = None
 
     externalUser: Optional[ExternalUser] = None
 
+    attributes: Optional[dict[str, str]] = {}
+
+class Attribute(BaseModel):
+    id: int
+    name: str
+class AttributeOption(BaseModel):
+    id: int
+    name: str
+    attribute: Attribute
+
 class FeedbackResponse(Feedback):
     id: int
-    feedbackType: Literal['POSITIVE', 'NEGATIVE']
+    feedbackType: Optional[Literal['POSITIVE', 'NEGATIVE']] = None
     feedbackText: Optional[str] = None
     isDeleted: bool
     externalUserId: Optional[int] = None
