@@ -15,7 +15,7 @@ class UserClient:
         self.base_url = base_url
 
         self.base_endpoint = (
-            self.base_url + "/api/external/user"
+            self.base_url + "/api/external/users"
         )
         self.endpoint = (
             self.base_endpoint + f"?apiKey={self.api_key}"

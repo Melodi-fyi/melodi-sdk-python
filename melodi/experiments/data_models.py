@@ -1,9 +1,6 @@
-from typing import Dict, List, Literal, Optional, Union
+from typing import Dict, List, Optional
 
-from pydantic import BaseModel, Field, Json
-
-from melodi.threads.data_models import Message, ThreadResponse
-from melodi.users.data_models import User
+from pydantic import BaseModel
 
 
 class Sample(BaseModel):
