@@ -1,9 +1,11 @@
 from datetime import datetime
-from typing import Any, List, Literal, Optional, Union
+from typing import List, Optional, Union
 
 from pydantic import BaseModel, Extra, root_validator
 
+from melodi.messages.data_models import Message
 from melodi.users.data_models import User, UserResponse
+
 
 class Thread(BaseModel):
     id: Optional[int] = None
