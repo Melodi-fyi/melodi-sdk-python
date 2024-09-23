@@ -6,17 +6,18 @@ from typing import List, Optional
 
 import requests
 from pydantic.tools import parse_obj_as
-from requests.models import Response
 
+from melodi.feedback.data_models import Feedback, FeedbackResponse
+from melodi.logging import _log_melodi_http_errors
+from melodi.projects.data_models import ProjectResponse
+from melodi.threads.data_models import (IntentMessageAssociation,
+                                        IssueMessageAssociation,
+                                        MessageResponse)
 from melodi.threads.threads_client import ThreadsClient
+from melodi.users.data_models import User, UserResponse
 
-from .data_models import (BakeoffSample, BinarySample, Comparisons,
-                          ExternalUser, ExternalUserResponse, Feedback,
-                          FeedbackResponse, IntentMessageAssociation,
-                          IssueMessageAssociation, Log, LogResponse,
-                          MessageResponse, ProjectResponse, Samples, Thread,
-                          ThreadResponse, ThreadsPagedResponse,
-                          ThreadsQueryParams)
+from .data_models import (BakeoffSample, BinarySample, Comparisons, Log,
+                          LogResponse, Samples)
 from .exceptions import MelodiAPIError
 
 
@@ -211,7 +212,7 @@ class MelodiClient:
                 json=log.dict(by_alias=True),
             )
 
-            self._log_melodi_http_errors(response)
+            _log_melodi_http_errors(response)
             response.raise_for_status()
             return parse_obj_as(LogResponse, response.json())
         except MelodiAPIError as e:
@@ -226,7 +227,7 @@ class MelodiClient:
                 headers=self._get_headers(),
             )
 
-            self._log_melodi_http_errors(response)
+            _log_melodi_http_errors(response)
             response.raise_for_status()
             return parse_obj_as(FeedbackResponse, response.json())
         except MelodiAPIError as e:
@@ -319,7 +320,7 @@ class MelodiClient:
         try:
             response = requests.request("GET", url)
 
-            self._log_melodi_http_errors(response)
+            _log_melodi_http_errors(response)
             response.raise_for_status()
             return parse_obj_as(LogResponse, response.json())
         except MelodiAPIError as e:
@@ -331,7 +332,7 @@ class MelodiClient:
         try:
             response = requests.request("GET", url)
 
-            self._log_melodi_http_errors(response)
+            _log_melodi_http_errors(response)
             response.raise_for_status()
             return parse_obj_as(MessageResponse, response.json())
         except MelodiAPIError as e:
@@ -345,7 +346,7 @@ class MelodiClient:
                 url, headers=self._get_headers(), json={"issueId": issue_id, "messageId": message_id}
             )
 
-            self._log_melodi_http_errors(response)
+            _log_melodi_http_errors(response)
             response.raise_for_status()
             return response.json()
         except MelodiAPIError as e:
@@ -369,7 +370,7 @@ class MelodiClient:
                 url, headers=self._get_headers()
             )
 
-            self._log_melodi_http_errors(response)
+            _log_melodi_http_errors(response)
             response.raise_for_status()
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
@@ -382,7 +383,7 @@ class MelodiClient:
                 url, headers=self._get_headers(), json={"intentId": intent_id, "messageId": message_id}
             )
 
-            self._log_melodi_http_errors(response)
+            _log_melodi_http_errors(response)
             response.raise_for_status()
             return response.json()
         except MelodiAPIError as e:
@@ -406,7 +407,7 @@ class MelodiClient:
                 url, headers=self._get_headers()
             )
 
-            self._log_melodi_http_errors(response)
+            _log_melodi_http_errors(response)
             response.raise_for_status()
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
@@ -415,7 +416,7 @@ class MelodiClient:
         try:
             response = requests.request("GET", self.projects_endpoint)
 
-            self._log_melodi_http_errors(response)
+            _log_melodi_http_errors(response)
             response.raise_for_status()
 
             return parse_obj_as(List[ProjectResponse], response.json())
@@ -426,7 +427,7 @@ class MelodiClient:
         try:
             response = requests.request("GET", f"{self.projects_endpoint}&name={name}")
 
-            self._log_melodi_http_errors(response)
+            _log_melodi_http_errors(response)
             response.raise_for_status()
 
             projects = parse_obj_as(List[ProjectResponse], response.json())
@@ -447,22 +448,22 @@ class MelodiClient:
                 url, headers=self._get_headers(), json={"name": name}
             )
 
-            self._log_melodi_http_errors(response)
+            _log_melodi_http_errors(response)
             response.raise_for_status()
             return parse_obj_as(ProjectResponse, response.json())
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
-    def update_external_user(self, external_user: ExternalUser) -> ExternalUser:
-        url = f"{self.external_users_base_endpoint}/{external_user.externalId}?apiKey={self.api_key}"
+    def update_external_user(self, user: User) -> User:
+        url = f"{self.external_users_base_endpoint}/{user.externalId}?apiKey={self.api_key}"
 
         try:
             response = requests.patch(
-                url, headers=self._get_headers(), json=external_user.dict(by_alias=True)
+                url, headers=self._get_headers(), json=user.dict(by_alias=True)
             )
 
-            self._log_melodi_http_errors(response)
+            _log_melodi_http_errors(response)
             response.raise_for_status()
-            return parse_obj_as(ExternalUserResponse, response.json())
+            return parse_obj_as(UserResponse, response.json())
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
