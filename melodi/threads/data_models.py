@@ -5,32 +5,6 @@ from pydantic import BaseModel, Extra, root_validator
 
 from melodi.users.data_models import User, UserResponse
 
-
-class IssueMessageAssociation(BaseModel):
-    id: int
-    issueId: int
-    messageId: int
-    userId: int
-
-class IntentMessageAssociation(BaseModel):
-    id: int
-    intentId: int
-    messageId: int
-    userId: int
-
-class Message(BaseModel):
-    externalId: Optional[str] = None
-    type: Literal['markdown', 'json'] = 'markdown'
-    role: str
-    content: Optional[str] = None
-    jsonContent: Optional[Any] = None
-    metadata: dict[str, Union[str, int]] = {}
-
-class MessageResponse(Message):
-    id: int
-    issueAssociations: List[IssueMessageAssociation]
-    intentAssociations: List[IntentMessageAssociation]
-
 class Thread(BaseModel):
     id: Optional[int] = None
     externalId: Optional[str] = None
