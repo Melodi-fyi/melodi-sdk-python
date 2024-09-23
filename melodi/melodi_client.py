@@ -7,7 +7,6 @@ from typing import Optional
 import requests
 from pydantic.tools import parse_obj_as
 
-from melodi.feedback.data_models import Feedback, FeedbackResponse
 from melodi.feedback.feedback_client import FeedbackClient
 from melodi.logging import _log_melodi_http_errors
 from melodi.projects.projects_client import ProjectsClient
@@ -15,7 +14,7 @@ from melodi.threads.data_models import (IntentMessageAssociation,
                                         IssueMessageAssociation,
                                         MessageResponse)
 from melodi.threads.threads_client import ThreadsClient
-from melodi.users.data_models import User, UserResponse
+from melodi.users.user_client import UserClient
 
 from .data_models import (BakeoffSample, BinarySample, Comparisons, Log,
                           LogResponse, Samples)
@@ -60,6 +59,7 @@ class MelodiClient:
         self.threads = ThreadsClient(base_url=self.base_url, api_key=self.api_key)
         self.projects = ProjectsClient(base_url=self.base_url, api_key=self.api_key)
         self.feedback = FeedbackClient(base_url=self.base_url, api_key=self.api_key)
+        self.users = UserClient(base_url=self.base_url, api_key=self.api_key)
 
         if verbose:
             logging.basicConfig(level=logging.INFO)
@@ -390,16 +390,3 @@ class MelodiClient:
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
-    def update_external_user(self, user: User) -> User:
-        url = f"{self.external_users_base_endpoint}/{user.externalId}?apiKey={self.api_key}"
-
-        try:
-            response = requests.patch(
-                url, headers=self._get_headers(), json=user.dict(by_alias=True)
-            )
-
-            _log_melodi_http_errors(response)
-            response.raise_for_status()
-            return parse_obj_as(UserResponse, response.json())
-        except MelodiAPIError as e:
-            raise MelodiAPIError(e)
