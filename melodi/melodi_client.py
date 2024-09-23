@@ -8,6 +8,7 @@ import requests
 from pydantic.tools import parse_obj_as
 
 from melodi.feedback.data_models import Feedback, FeedbackResponse
+from melodi.feedback.feedback_client import FeedbackClient
 from melodi.logging import _log_melodi_http_errors
 from melodi.projects.projects_client import ProjectsClient
 from melodi.threads.data_models import (IntentMessageAssociation,
@@ -40,13 +41,6 @@ class MelodiClient:
             self.experiments_base_endpoint + f"?apiKey={self.api_key}"
         )
 
-        self.create_feedback_base_endpoint = (
-            self.base_url + "/api/external/feedback"
-        )
-        self.create_feedback_endpoint = (
-            self.create_feedback_base_endpoint + f"?apiKey={self.api_key}"
-        )
-
         self.logs_base_endpoint = self.base_url + "/api/external/logs"
         self.logs_endpont = self.logs_base_endpoint + f"?apiKey={self.api_key}"
 
@@ -65,6 +59,7 @@ class MelodiClient:
 
         self.threads = ThreadsClient(base_url=self.base_url, api_key=self.api_key)
         self.projects = ProjectsClient(base_url=self.base_url, api_key=self.api_key)
+        self.feedback = FeedbackClient(base_url=self.base_url, api_key=self.api_key)
 
         if verbose:
             logging.basicConfig(level=logging.INFO)
@@ -213,21 +208,6 @@ class MelodiClient:
             _log_melodi_http_errors(response)
             response.raise_for_status()
             return parse_obj_as(LogResponse, response.json())
-        except MelodiAPIError as e:
-            raise MelodiAPIError(e)
-
-    def create_feedback(self, feedback: Feedback) -> FeedbackResponse:
-        try:
-            response = requests.request(
-                "POST",
-                url=self.create_feedback_endpoint,
-                json=feedback.dict(by_alias=True),
-                headers=self._get_headers(),
-            )
-
-            _log_melodi_http_errors(response)
-            response.raise_for_status()
-            return parse_obj_as(FeedbackResponse, response.json())
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
