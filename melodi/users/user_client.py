@@ -31,7 +31,7 @@ class UserClient(BaseClient):
                 url, headers=self._get_headers(), json=user.dict(by_alias=True)
             )
 
-            _log_melodi_http_errors(response)
+            _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
             return parse_obj_as(UserResponse, response.json())
         except MelodiAPIError as e:

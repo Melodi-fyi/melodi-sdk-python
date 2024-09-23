@@ -27,7 +27,7 @@ class ThreadsClient(BaseClient):
             response = requests.post(
                 self.endpoint, headers=self._get_headers(), json=thread.dict(by_alias=True)
             )
-            _log_melodi_http_errors(response)
+            _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
             return parse_obj_as(ThreadResponse, response.json())
         except MelodiAPIError as e:
@@ -38,7 +38,7 @@ class ThreadsClient(BaseClient):
             response = requests.put(
                 self.endpoint, headers=self._get_headers(), json=thread.dict(by_alias=True)
             )
-            _log_melodi_http_errors(response)
+            _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
             return parse_obj_as(ThreadResponse, response.json())
         except MelodiAPIError as e:
@@ -62,7 +62,7 @@ class ThreadsClient(BaseClient):
         try:
             response = requests.request("GET", url)
 
-            _log_melodi_http_errors(response)
+            _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
 
             return parse_obj_as(ThreadsPagedResponse, response.json())

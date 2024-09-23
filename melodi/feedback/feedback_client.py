@@ -32,7 +32,7 @@ class FeedbackClient(BaseClient):
                 headers=self._get_headers(),
             )
 
-            _log_melodi_http_errors(response)
+            _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
             return parse_obj_as(FeedbackResponse, response.json())
         except MelodiAPIError as e:

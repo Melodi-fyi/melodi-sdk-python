@@ -38,7 +38,7 @@ class MessagesClient(BaseClient):
         try:
             response = requests.request("GET", url)
 
-            _log_melodi_http_errors(response)
+            _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
             return parse_obj_as(MessageResponse, response.json())
         except MelodiAPIError as e:
@@ -52,7 +52,7 @@ class MessagesClient(BaseClient):
                 url, headers=self._get_headers(), json={"issueId": issue_id, "messageId": message_id}
             )
 
-            _log_melodi_http_errors(response)
+            _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
             return response.json()
         except MelodiAPIError as e:
@@ -76,7 +76,7 @@ class MessagesClient(BaseClient):
                 url, headers=self._get_headers()
             )
 
-            _log_melodi_http_errors(response)
+            _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
@@ -89,7 +89,7 @@ class MessagesClient(BaseClient):
                 url, headers=self._get_headers(), json={"intentId": intent_id, "messageId": message_id}
             )
 
-            _log_melodi_http_errors(response)
+            _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
             return response.json()
         except MelodiAPIError as e:
@@ -113,7 +113,7 @@ class MessagesClient(BaseClient):
                 url, headers=self._get_headers()
             )
 
-            _log_melodi_http_errors(response)
+            _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
         except MelodiAPIError as e:
             raise MelodiAPIError(e)

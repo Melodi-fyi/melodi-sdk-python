@@ -24,7 +24,7 @@ class ProjectsClient(BaseClient):
         try:
             response = requests.request("GET", self.endpoint)
 
-            _log_melodi_http_errors(response)
+            _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
 
             return parse_obj_as(List[ProjectResponse], response.json())
@@ -35,7 +35,7 @@ class ProjectsClient(BaseClient):
         try:
             response = requests.request("GET", f"{self.endpoint}&name={name}")
 
-            _log_melodi_http_errors(response)
+            _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
 
             projects = parse_obj_as(List[ProjectResponse], response.json())
@@ -54,7 +54,7 @@ class ProjectsClient(BaseClient):
                 self.endpoint, headers=self._get_headers(), json={"name": name}
             )
 
-            _log_melodi_http_errors(response)
+            _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
             return parse_obj_as(ProjectResponse, response.json())
         except MelodiAPIError as e:
