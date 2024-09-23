@@ -8,6 +8,8 @@ import requests
 from pydantic.tools import parse_obj_as
 from requests.models import Response
 
+from melodi.threads.threads_client import ThreadsClient
+
 from .data_models import (BakeoffSample, BinarySample, Comparisons,
                           ExternalUser, ExternalUserResponse, Feedback,
                           FeedbackResponse, IntentMessageAssociation,
@@ -47,9 +49,6 @@ class MelodiClient:
         self.logs_base_endpoint = self.base_url + "/api/external/logs"
         self.logs_endpont = self.logs_base_endpoint + f"?apiKey={self.api_key}"
 
-        self.threads_base_endpoint = self.base_url + "/api/external/threads"
-        self.threads_endpoint = self.threads_base_endpoint + f"?apiKey={self.api_key}"
-
         self.messages_base_endpoint = self.base_url + "/api/external/messages"
         self.messages_endpoint = self.messages_base_endpoint + f"?apiKey={self.api_key}"
 
@@ -66,6 +65,8 @@ class MelodiClient:
 
         self.logger = logging.getLogger(__name__)
 
+        self.threads = ThreadsClient(base_url=self.base_url, api_key=self.api_key)
+
         if verbose:
             logging.basicConfig(level=logging.INFO)
         else:
@@ -74,16 +75,6 @@ class MelodiClient:
     @staticmethod
     def _get_headers():
         return {"Content-Type": "application/json"}
-
-    def _log_melodi_http_errors(self, response: Response):
-        if (response.status_code == 400):
-            try:
-                responseJson = response.json()
-                if (responseJson["errors"]):
-                    for error in responseJson["errors"]:
-                        self.logger.error(f"Bad Request response from Melodi API: {error}")
-            except:
-                pass
 
     def _send_create_experiment_request(self, request_data):
         response = None
@@ -321,57 +312,6 @@ class MelodiClient:
             if response.status_code == 200
             else None
         )
-
-    def create_thread(self, thread: Thread) -> ThreadResponse:
-        url = self.threads_endpoint
-
-        try:
-            response = requests.post(
-                url, headers=self._get_headers(), json=thread.dict(by_alias=True)
-            )
-            self._log_melodi_http_errors(response)
-            response.raise_for_status()
-            return parse_obj_as(ThreadResponse, response.json())
-        except MelodiAPIError as e:
-            raise MelodiAPIError(e)
-
-    def create_or_update_thread(self, thread: Thread) -> ThreadResponse:
-        url = self.threads_endpoint
-
-        try:
-            response = requests.put(
-                url, headers=self._get_headers(), json=thread.dict(by_alias=True)
-            )
-            self._log_melodi_http_errors(response)
-            response.raise_for_status()
-            return parse_obj_as(ThreadResponse, response.json())
-        except MelodiAPIError as e:
-            raise MelodiAPIError(e)
-
-    def get_threads_paged(self, query_params: ThreadsQueryParams = ThreadsQueryParams()) -> ThreadsPagedResponse:
-        url = f"{self.threads_endpoint}&pageIndex={query_params.pageIndex}&pageSize={query_params.pageSize}"
-
-        if (query_params.projectId):
-            url = f"{url}&projectId={query_params.projectId}"
-        if (query_params.before):
-            url = f"{url}&before={query_params.before.isoformat()}"
-        if (query_params.after):
-            url = f"{url}&after={query_params.after.isoformat()}"
-        if (query_params.search):
-            url = f"{url}&search={query_params.search}"
-        if (query_params.userSegmentIds):
-            for userSegmentId in query_params.userSegmentIds:
-                url = f"{url}&userSegmentIds={userSegmentId}"
-
-        try:
-            response = requests.request("GET", url)
-
-            self._log_melodi_http_errors(response)
-            response.raise_for_status()
-
-            return parse_obj_as(ThreadsPagedResponse, response.json())
-        except MelodiAPIError as e:
-            raise MelodiAPIError(e)
 
     def get_log(self, log_id: int) -> LogResponse:
         url = f"{self.logs_base_endpoint}/{log_id}?apiKey={self.api_key}"

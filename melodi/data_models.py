@@ -1,8 +1,9 @@
-from datetime import datetime
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Dict, List, Literal, Optional, Union
 
-from pydantic import (BaseModel, ConfigDict, EmailStr, Extra, Field, Json,
-                      root_validator)
+from pydantic import BaseModel, Field, Json
+
+from melodi.threads.data_models import Message, ThreadResponse
+from melodi.users.data_models import User
 
 
 class Sample(BaseModel):
@@ -37,48 +38,6 @@ class Item(BaseModel):
     versionName: str
     data: Dict
 
-class ExternalUser(BaseModel):
-    externalId: str
-    email: Optional[EmailStr] = None
-    name: Optional[str] = None
-    segments: Optional[dict[str, str]] = {}
-
-class Message(BaseModel):
-    externalId: Optional[str] = None
-    type: Literal['markdown', 'json'] = 'markdown'
-    role: str
-    content: Optional[str] = None
-    jsonContent: Optional[Any] = None
-    metadata: dict[str, Union[str, int]] = {}
-
-class Thread(BaseModel):
-    id: Optional[int] = None
-    externalId: Optional[str] = None
-    projectId: Optional[int] = None
-    projectName: Optional[str] = None
-    messages: List[Message]
-    metadata: dict[str, Union[str, int]] = {}
-    externalUser: Optional[ExternalUser] = None
-
-    @root_validator
-    def validate_gpa_and_fees(cls, values):
-        projectId = values.get('projectId')
-        projectName = values.get('projectName')
-        assert projectId or projectName, "Must include projectId or projectName"
-        return values
-
-class ThreadsQueryParams(BaseModel):
-  class Config:
-    extra = Extra.forbid
-
-  pageSize: int = 50
-  pageIndex: int = 0
-  projectId: Optional[int] = None
-  userSegmentIds: Optional[List[int]] = None
-  search: Optional[str] = None
-  before: Optional[datetime] = None
-  after: Optional[datetime] = None
-
 class IssueLogAssociation(BaseModel):
     id: int
     issueId: int
@@ -90,23 +49,6 @@ class IntentLogAssociation(BaseModel):
     intentId: int
     messageId: int
     userId: int
-
-class IssueMessageAssociation(BaseModel):
-    id: int
-    issueId: int
-    messageId: int
-    userId: int
-
-class IntentMessageAssociation(BaseModel):
-    id: int
-    intentId: int
-    messageId: int
-    userId: int
-
-class MessageResponse(Message):
-    id: int
-    issueAssociations: List[IssueMessageAssociation]
-    intentAssociations: List[IntentMessageAssociation]
 
 class LogInput(BaseModel):
     type: Literal['json', 'markdown', 'messages']
@@ -137,82 +79,9 @@ class Log(BaseModel):
     input: Optional[LogInput] = None
     output: LogOutput
 
-    externalUser: Optional[ExternalUser] = None
+    externalUser: Optional[User] = None
 
     metadata: dict[str, Union[str, int]] = {}
-
-class Feedback(BaseModel):
-    externalLogId: Optional[str] = None
-
-    externalThreadId: Optional[str] = None
-    externalMessageId: Optional[str] = None
-
-    log: Optional[Log] = None
-
-    feedbackType: Optional[Literal['POSITIVE', 'NEGATIVE']] = None
-    feedbackText: Optional[str] = None
-
-    externalUser: Optional[ExternalUser] = None
-
-    attributes: Optional[dict[str, str]] = {}
-
-class Attribute(BaseModel):
-    id: int
-    name: str
-class AttributeOption(BaseModel):
-    id: int
-    name: str
-    attribute: Attribute
-
-class FeedbackResponse(Feedback):
-    id: int
-    feedbackType: Optional[Literal['POSITIVE', 'NEGATIVE']] = None
-    feedbackText: Optional[str] = None
-    isDeleted: bool
-    externalUserId: Optional[int] = None
-    logId: Optional[int] = None
-    createdAt: datetime
-    updatedAt: datetime
-
-class ProjectResponse(BaseModel):
-    id: int
-    name: str
-    organizationId: int
-    userId: Optional[int] = None
-    isDefault: bool
-    isDeleted: bool
-    chainId: Optional[int] = None
-    chainDisplayOrder: Optional[int] = None
-    useCase: Optional[str] = None
-    notes: Optional[str] = None
-    createdAt: datetime
-    updatedAt: datetime
-
-class UserSegmentTypeResponse(BaseModel):
-    id: int
-    name: str
-
-class UserSegmentRespone(BaseModel):
-    id: int
-    type: UserSegmentTypeResponse
-    name: str
-
-class ExternalUserResponse(BaseModel):
-    id: int
-    externalId: str
-    email: Optional[EmailStr] = None
-    name: Optional[str] = None
-    segments: List[UserSegmentRespone]
-
-class ThreadResponse(Thread):
-    id: int
-    externalUser: Optional[ExternalUserResponse] = None
-    createdAt: datetime
-    updatedAt: datetime
-
-class ThreadsPagedResponse(BaseModel):
-    count: int
-    rows: List[ThreadResponse]
 
 class LogResponse(Log):
     id: int
