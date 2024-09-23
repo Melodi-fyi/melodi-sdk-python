@@ -2,14 +2,14 @@ import json
 import logging
 import os
 import re
-from typing import List, Optional
+from typing import Optional
 
 import requests
 from pydantic.tools import parse_obj_as
 
 from melodi.feedback.data_models import Feedback, FeedbackResponse
 from melodi.logging import _log_melodi_http_errors
-from melodi.projects.data_models import ProjectResponse
+from melodi.projects.projects_client import ProjectsClient
 from melodi.threads.data_models import (IntentMessageAssociation,
                                         IssueMessageAssociation,
                                         MessageResponse)
@@ -59,14 +59,12 @@ class MelodiClient:
         self.intent_message_associations_base_endpoint = self.base_url + "/api/external/intent-message-associations"
         self.intent_message_associations_endpoint = self.intent_message_associations_base_endpoint + f"?apiKey={self.api_key}"
 
-        self.projects_base_endpoint = self.base_url + "/api/external/projects"
-        self.projects_endpoint = self.projects_base_endpoint + f"?apiKey={self.api_key}"
-
         self.external_users_base_endpoint = self.base_url + "/api/external/users"
 
         self.logger = logging.getLogger(__name__)
 
         self.threads = ThreadsClient(base_url=self.base_url, api_key=self.api_key)
+        self.projects = ProjectsClient(base_url=self.base_url, api_key=self.api_key)
 
         if verbose:
             logging.basicConfig(level=logging.INFO)
@@ -409,48 +407,6 @@ class MelodiClient:
 
             _log_melodi_http_errors(response)
             response.raise_for_status()
-        except MelodiAPIError as e:
-            raise MelodiAPIError(e)
-
-    def list_projects(self) -> List[ProjectResponse]:
-        try:
-            response = requests.request("GET", self.projects_endpoint)
-
-            _log_melodi_http_errors(response)
-            response.raise_for_status()
-
-            return parse_obj_as(List[ProjectResponse], response.json())
-        except MelodiAPIError as e:
-            raise MelodiAPIError(e)
-
-    def get_project_by_name(self, name: str) -> ProjectResponse:
-        try:
-            response = requests.request("GET", f"{self.projects_endpoint}&name={name}")
-
-            _log_melodi_http_errors(response)
-            response.raise_for_status()
-
-            projects = parse_obj_as(List[ProjectResponse], response.json())
-
-            if (len(projects) > 0):
-                return projects[0]
-            else:
-                return None
-
-        except MelodiAPIError as e:
-            raise MelodiAPIError(e)
-
-    def create_project(self, name: str) -> ProjectResponse:
-        url = self.projects_endpoint
-
-        try:
-            response = requests.post(
-                url, headers=self._get_headers(), json={"name": name}
-            )
-
-            _log_melodi_http_errors(response)
-            response.raise_for_status()
-            return parse_obj_as(ProjectResponse, response.json())
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
