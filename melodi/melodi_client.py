@@ -5,20 +5,14 @@ import re
 from typing import Optional
 
 import requests
-from pydantic.tools import parse_obj_as
 
 from melodi.feedback.feedback_client import FeedbackClient
-from melodi.logging import _log_melodi_http_errors
 from melodi.messages.messages_client import MessagesClient
 from melodi.projects.projects_client import ProjectsClient
-from melodi.threads.data_models import (IntentMessageAssociation,
-                                        IssueMessageAssociation,
-                                        MessageResponse)
 from melodi.threads.threads_client import ThreadsClient
 from melodi.users.user_client import UserClient
 
-from .data_models import (BakeoffSample, BinarySample, Comparisons, Log,
-                          LogResponse, Samples)
+from .data_models import (BakeoffSample, BinarySample, Comparisons, Samples)
 from .exceptions import MelodiAPIError
 
 
@@ -40,9 +34,6 @@ class MelodiClient:
         self.experiments_endpoint = (
             self.experiments_base_endpoint + f"?apiKey={self.api_key}"
         )
-
-        self.logs_base_endpoint = self.base_url + "/api/external/logs"
-        self.logs_endpont = self.logs_base_endpoint + f"?apiKey={self.api_key}"
 
         self.logger = logging.getLogger(__name__)
 
@@ -188,20 +179,6 @@ class MelodiClient:
 
         return self._send_create_experiment_request(request_data=request_data)
 
-    def create_log(self, log: Log) -> LogResponse:
-        try:
-            response = requests.post(
-                self.logs_endpont,
-                headers=self._get_headers(),
-                json=log.dict(by_alias=True),
-            )
-
-            _log_melodi_http_errors(response)
-            response.raise_for_status()
-            return parse_obj_as(LogResponse, response.json())
-        except MelodiAPIError as e:
-            raise MelodiAPIError(e)
-
     def create_binary_evaluation_experiment(
         self,
         name: str,
@@ -282,18 +259,3 @@ class MelodiClient:
             if response.status_code == 200
             else None
         )
-
-    def get_log(self, log_id: int) -> LogResponse:
-        url = f"{self.logs_base_endpoint}/{log_id}?apiKey={self.api_key}"
-
-        try:
-            response = requests.request("GET", url)
-
-            _log_melodi_http_errors(response)
-            response.raise_for_status()
-            return parse_obj_as(LogResponse, response.json())
-        except MelodiAPIError as e:
-            raise MelodiAPIError(e)
-
-
-
