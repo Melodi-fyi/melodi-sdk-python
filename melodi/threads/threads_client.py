@@ -3,15 +3,15 @@ import logging
 import requests
 from pydantic import parse_obj_as
 
+from melodi.base_client import BaseClient
 from melodi.exceptions import MelodiAPIError
 from melodi.logging import _log_melodi_http_errors
-from melodi.melodi_client import MelodiClient
 from melodi.threads.data_models import (Thread, ThreadResponse,
                                         ThreadsPagedResponse,
                                         ThreadsQueryParams)
 
 
-class ThreadsClient:
+class ThreadsClient(BaseClient):
     def __init__(self, base_url: str, api_key: str):
         self.api_key = api_key
         self.base_url = base_url
@@ -25,7 +25,7 @@ class ThreadsClient:
     def create(self, thread: Thread) -> ThreadResponse:
         try:
             response = requests.post(
-                self.endpoint, headers=MelodiClient._get_headers(), json=thread.dict(by_alias=True)
+                self.endpoint, headers=self._get_headers(), json=thread.dict(by_alias=True)
             )
             _log_melodi_http_errors(response)
             response.raise_for_status()
@@ -36,7 +36,7 @@ class ThreadsClient:
     def create_or_update(self, thread: Thread) -> ThreadResponse:
         try:
             response = requests.put(
-                self.endpoint, headers=MelodiClient._get_headers(), json=thread.dict(by_alias=True)
+                self.endpoint, headers=self._get_headers(), json=thread.dict(by_alias=True)
             )
             _log_melodi_http_errors(response)
             response.raise_for_status()

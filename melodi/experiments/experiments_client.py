@@ -5,12 +5,13 @@ from typing import Optional
 
 import requests
 
+from melodi.base_client import BaseClient
 from melodi.exceptions import MelodiAPIError
-from melodi.experiments.data_models import BakeoffSample, BinarySample, Comparisons, Samples
-from melodi.melodi_client import MelodiClient
+from melodi.experiments.data_models import (BakeoffSample, BinarySample,
+                                            Comparisons, Samples)
 
 
-class ExperimentsClient:
+class ExperimentsClient(BaseClient):
     def __init__(self, base_url: str, api_key: str):
         self.api_key = api_key
         self.base_url = base_url
@@ -30,7 +31,7 @@ class ExperimentsClient:
         try:
             response = requests.post(
                 self.endpoint,
-                headers=MelodiClient._get_headers(),
+                headers=self._get_headers(),
                 json=request_data,
             )
             response.raise_for_status()
@@ -194,7 +195,7 @@ class ExperimentsClient:
         return self._send_create_experiment_request(request_data=request_data)
 
     def log_binary_sample(self, experiment_id: int, sample: BinarySample) -> None:
-        endpoint = f"{self.experiments_base_endpoint}/{experiment_id}/samples?apiKey={self.api_key}"
+        endpoint = f"{self.base_endpoint}/{experiment_id}/samples?apiKey={self.api_key}"
 
         try:
             response = requests.post(endpoint, json=sample.dict(by_alias=True))
@@ -214,7 +215,7 @@ class ExperimentsClient:
 
         try:
             response = requests.post(
-                endpoint, headers=MelodiClient._get_headers(), json=comparison
+                endpoint, headers=self._get_headers(), json=comparison
             )
             response.raise_for_status()
             return response

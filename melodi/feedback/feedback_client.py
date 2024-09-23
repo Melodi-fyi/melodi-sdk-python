@@ -3,13 +3,13 @@ import logging
 import requests
 from pydantic import parse_obj_as
 
+from melodi.base_client import BaseClient
 from melodi.exceptions import MelodiAPIError
 from melodi.feedback.data_models import Feedback, FeedbackResponse
 from melodi.logging import _log_melodi_http_errors
-from melodi.melodi_client import MelodiClient
 
 
-class FeedbackClient:
+class FeedbackClient(BaseClient):
     def __init__(self, base_url: str, api_key: str):
         self.api_key = api_key
         self.base_url = base_url
@@ -29,7 +29,7 @@ class FeedbackClient:
                 "POST",
                 url=self.endpoint,
                 json=feedback.dict(by_alias=True),
-                headers=MelodiClient._get_headers(),
+                headers=self._get_headers(),
             )
 
             _log_melodi_http_errors(response)

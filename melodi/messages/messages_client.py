@@ -3,15 +3,15 @@ import logging
 import requests
 from pydantic import parse_obj_as
 
+from melodi.base_client import BaseClient
 from melodi.exceptions import MelodiAPIError
 from melodi.logging import _log_melodi_http_errors
-from melodi.melodi_client import MelodiClient
 from melodi.messages.data_models import (IntentMessageAssociation,
                                          IssueMessageAssociation,
                                          MessageResponse)
 
 
-class MessagesClient:
+class MessagesClient(BaseClient):
     def __init__(self, base_url: str, api_key: str):
         self.api_key = api_key
         self.base_url = base_url
@@ -49,7 +49,7 @@ class MessagesClient:
 
         try:
             response = requests.post(
-                url, headers=MelodiClient._get_headers(), json={"issueId": issue_id, "messageId": message_id}
+                url, headers=self._get_headers(), json={"issueId": issue_id, "messageId": message_id}
             )
 
             _log_melodi_http_errors(response)
@@ -73,7 +73,7 @@ class MessagesClient:
 
         try:
             response = requests.delete(
-                url, headers=MelodiClient._get_headers()
+                url, headers=self._get_headers()
             )
 
             _log_melodi_http_errors(response)
@@ -86,7 +86,7 @@ class MessagesClient:
 
         try:
             response = requests.post(
-                url, headers=MelodiClient._get_headers(), json={"intentId": intent_id, "messageId": message_id}
+                url, headers=self._get_headers(), json={"intentId": intent_id, "messageId": message_id}
             )
 
             _log_melodi_http_errors(response)
@@ -110,7 +110,7 @@ class MessagesClient:
 
         try:
             response = requests.delete(
-                url, headers=MelodiClient._get_headers()
+                url, headers=self._get_headers()
             )
 
             _log_melodi_http_errors(response)
