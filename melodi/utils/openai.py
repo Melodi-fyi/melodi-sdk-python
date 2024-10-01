@@ -1,6 +1,3 @@
-
-
-
 from melodi.messages.data_models import Message
 from melodi.threads.data_models import Thread
 from melodi.users.data_models import User
