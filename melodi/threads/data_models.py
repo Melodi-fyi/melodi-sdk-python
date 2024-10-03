@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Optional, Union
 
-from pydantic import BaseModel, Extra, root_validator
+from pydantic import BaseModel, Extra
 
 from melodi.messages.data_models import Message
 from melodi.users.data_models import User, UserResponse
@@ -15,13 +15,6 @@ class Thread(BaseModel):
     messages: List[Message]
     metadata: dict[str, Union[str, int]] = {}
     externalUser: Optional[User] = None
-
-    @root_validator
-    def validate_project_fields(cls, values):
-        projectId = values.get('projectId')
-        projectName = values.get('projectName')
-        assert projectId or projectName, "Must include projectId or projectName"
-        return values
 
 class ThreadsQueryParams(BaseModel):
   class Config:
