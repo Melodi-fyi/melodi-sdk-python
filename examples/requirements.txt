@@ -1,2 +1,2 @@
-pydantic==1.10.17
+pydantic==2.9.2
 melodi
