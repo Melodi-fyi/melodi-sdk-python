@@ -23,6 +23,20 @@ class UserClient(BaseClient):
 
         self.logger = logging.getLogger(__name__)
 
+    def create_or_update(self, user: User) -> UserResponse:
+        url = f"{self.base_endpoint}?apiKey={self.api_key}"
+
+        try:
+            response = requests.put(
+                url, headers=self._get_headers(), json=user.dict(by_alias=True)
+            )
+
+            _log_melodi_http_errors(self.logger, response)
+            response.raise_for_status()
+            return parse_obj_as(UserResponse, response.json())
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)
+
     def update(self, user: User) -> User:
         url = f"{self.base_endpoint}/{user.externalId}?apiKey={self.api_key}"
 
