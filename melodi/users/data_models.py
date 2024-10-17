@@ -7,6 +7,7 @@ class User(BaseModel):
     externalId: str
     email: Optional[EmailStr] = None
     name: Optional[str] = None
+    username: Optional[str] = None
     segments: Optional[dict[str, str]] = {}
 
 class UserSegmentTypeResponse(BaseModel):
@@ -23,4 +24,5 @@ class UserResponse(BaseModel):
     externalId: str
     email: Optional[EmailStr] = None
     name: Optional[str] = None
+    username: Optional[str] = None
     segments: List[UserSegmentRespone]
