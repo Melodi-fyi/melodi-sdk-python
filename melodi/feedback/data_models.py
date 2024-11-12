@@ -32,7 +32,6 @@ class FeedbackResponse(Feedback):
     id: int
     feedbackType: Optional[Literal['POSITIVE', 'NEGATIVE']] = None
     feedbackText: Optional[str] = None
-    isDeleted: bool
     externalUserId: Optional[int] = None
     logId: Optional[int] = None
     createdAt: datetime
