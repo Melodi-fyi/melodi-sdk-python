@@ -22,7 +22,7 @@ class UserSegmentRespone(BaseModel):
 class UserResponse(BaseModel):
     id: int
     externalId: str
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     name: Optional[str] = None
     username: Optional[str] = None
     segments: List[UserSegmentRespone]
