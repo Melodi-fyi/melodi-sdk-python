@@ -30,11 +30,24 @@ class ThreadsQueryParams(BaseModel):
   before: Optional[datetime] = None
   after: Optional[datetime] = None
 
-class ThreadResponse(Thread):
+class SimpleProject(BaseModel):
     id: int
+    name: str
+
+class ThreadResponse(BaseModel):
+    id: int
+    organizationId: int
+    externalId: Optional[str] = None
+
+    project: SimpleProject
+
     externalUser: Optional[UserResponse] = None
+
+    metadata: dict[str, Union[str, int]] = {}
+
     createdAt: datetime
     updatedAt: datetime
+
 class ThreadsPagedResponse(BaseModel):
     count: int
     rows: List[ThreadResponse]
