@@ -2,6 +2,8 @@ from typing import Any, List, Literal, Optional, Union
 
 from pydantic import BaseModel
 
+from melodi.feedback.data_models import FeedbackResponse
+
 
 class IssueMessageAssociation(BaseModel):
     id: int
@@ -15,6 +17,9 @@ class IntentMessageAssociation(BaseModel):
     messageId: int
     userId: int
 
+class FeedbackMessageAssociation(BaseModel):
+    externalFeedback: FeedbackResponse
+
 class Message(BaseModel):
     externalId: Optional[str] = None
     type: Literal['markdown', 'json'] = 'markdown'
@@ -22,6 +27,9 @@ class Message(BaseModel):
     content: Optional[str] = None
     jsonContent: Optional[Any] = None
     metadata: dict[str, Union[str, int]] = {}
+
+class MessageWithFeedback(Message):
+    externalFeedbackAssociations: List[FeedbackMessageAssociation]
 
 class MessageResponse(Message):
     id: int
