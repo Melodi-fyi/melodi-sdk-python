@@ -1,14 +1,12 @@
 from datetime import datetime
-from typing import Literal, Optional
+from typing import List, Literal, Optional
 
 from pydantic import BaseModel
 
-from melodi.users.data_models import User
+from melodi.users.data_models import User, UserResponse
 
 
 class Feedback(BaseModel):
-    externalLogId: Optional[str] = None
-
     externalThreadId: Optional[str] = None
     externalMessageId: Optional[str] = None
 
@@ -30,9 +28,10 @@ class AttributeOption(BaseModel):
 
 class FeedbackResponse(Feedback):
     id: int
-    feedbackType: Optional[Literal['POSITIVE', 'NEGATIVE']] = None
-    feedbackText: Optional[str] = None
+
     externalUserId: Optional[int] = None
-    logId: Optional[int] = None
+    externalUser: Optional[UserResponse] = None
+
+    attributes: List[AttributeOption] = []
     createdAt: datetime
     updatedAt: datetime
