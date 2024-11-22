@@ -23,6 +23,8 @@ class ThreadsQueryParams(BaseModel):
   pageSize: int = 50
   pageIndex: int = 0
   projectId: Optional[int] = None
+  ids: Optional[List[int]] = None
+  externalIds: Optional[List[str]] = None
   userSegmentIds: Optional[List[int]] = None
   search: Optional[str] = None
   hasFeedback: Optional[bool] = None

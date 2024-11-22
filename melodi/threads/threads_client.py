@@ -50,6 +50,12 @@ class ThreadsClient(BaseClient):
 
         if (query_params.projectId):
             url = f"{url}&projectId={query_params.projectId}"
+        if (query_params.ids):
+            for threadId in query_params.ids:
+                url = f"{url}&ids={threadId}"
+        if (query_params.externalIds):
+            for externalId in query_params.externalIds:
+                url = f"{url}&externalIds={externalId}"
         if (query_params.before):
             url = f"{url}&before={query_params.before.isoformat()}"
         if (query_params.after):
