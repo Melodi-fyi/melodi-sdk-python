@@ -6,12 +6,13 @@ from pydantic import BaseModel
 from melodi.users.data_models import User, UserResponse
 
 
-class Feedback(BaseModel):
-    externalThreadId: Optional[str] = None
-    externalMessageId: Optional[str] = None
-
+class BaseFeedback(BaseModel):
     feedbackType: Optional[Literal['POSITIVE', 'NEGATIVE']] = None
     feedbackText: Optional[str] = None
+
+class Feedback(BaseFeedback):
+    externalThreadId: Optional[str] = None
+    externalMessageId: Optional[str] = None
 
     externalUser: Optional[User] = None
 
@@ -26,7 +27,7 @@ class AttributeOption(BaseModel):
     name: str
     attribute: Attribute
 
-class FeedbackResponse(Feedback):
+class FeedbackResponse(BaseFeedback):
     id: int
 
     externalUserId: Optional[int] = None
