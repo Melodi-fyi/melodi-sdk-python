@@ -32,6 +32,6 @@ class FeedbackResponse(Feedback):
     externalUserId: Optional[int] = None
     externalUser: Optional[UserResponse] = None
 
-    attributes: List[AttributeOption] = []
+    attributeOptions: List[AttributeOption] = []
     createdAt: datetime
     updatedAt: datetime
