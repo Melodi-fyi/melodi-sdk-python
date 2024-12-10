@@ -8,7 +8,7 @@ class User(BaseModel):
     email: Optional[EmailStr] = None
     name: Optional[str] = None
     username: Optional[str] = None
-    segments: Optional[dict[str, str]] = {}
+    segments: Optional[dict[str, List[str]]] = {}
 
 class UserSegmentTypeResponse(BaseModel):
     id: int
