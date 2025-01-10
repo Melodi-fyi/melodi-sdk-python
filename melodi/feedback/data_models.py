@@ -36,3 +36,6 @@ class FeedbackResponse(BaseFeedback):
     attributeOptions: List[AttributeOption] = []
     createdAt: datetime
     updatedAt: datetime
+
+class FeedbackUpdateRequest(Feedback):
+    id: Optional[int] = None

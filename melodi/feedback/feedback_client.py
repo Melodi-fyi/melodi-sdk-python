@@ -5,7 +5,8 @@ from pydantic import parse_obj_as
 
 from melodi.base_client import BaseClient
 from melodi.exceptions import MelodiAPIError
-from melodi.feedback.data_models import Feedback, FeedbackResponse
+from melodi.feedback.data_models import (Feedback, FeedbackResponse,
+                                         FeedbackUpdateRequest)
 from melodi.logging import _log_melodi_http_errors
 
 
@@ -29,6 +30,21 @@ class FeedbackClient(BaseClient):
                 "POST",
                 url=self.endpoint,
                 json=feedback.dict(by_alias=True),
+                headers=self._get_headers(),
+            )
+
+            _log_melodi_http_errors(self.logger, response)
+            response.raise_for_status()
+            return parse_obj_as(FeedbackResponse, response.json())
+        except MelodiAPIError as e:
+            raise MelodiAPIError(e)
+
+    def update(self, update: FeedbackUpdateRequest) -> FeedbackResponse:
+        try:
+            response = requests.request(
+                "PUT",
+                url=self.endpoint,
+                json=update.dict(by_alias=True),
                 headers=self._get_headers(),
             )
 
