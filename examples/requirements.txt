@@ -1,2 +1,2 @@
 pydantic==2.9.2
-melodi==0.1.13
+melodi==0.1.14
