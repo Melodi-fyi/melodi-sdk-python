@@ -1,6 +1,7 @@
+from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Extra
 
 
 class User(BaseModel):
@@ -26,3 +27,17 @@ class UserResponse(BaseModel):
     name: Optional[str] = None
     username: Optional[str] = None
     segments: List[UserSegmentRespone]
+
+
+class UsersQueryParams(BaseModel):
+  class Config:
+    extra = Extra.forbid
+
+  pageSize: int = 50
+  pageIndex: int = 0
+  projectId: Optional[int] = None
+  before: Optional[datetime] = None
+  after: Optional[datetime] = None
+class UsersPagedResponse(BaseModel):
+    count: int
+    rows: List[UserResponse]
