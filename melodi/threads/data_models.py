@@ -15,6 +15,7 @@ class Thread(BaseModel):
     messages: List[Message]
     metadata: dict[str, Union[str, int]] = {}
     externalUser: Optional[User] = None
+    createdAt: Optional[datetime] = None
 
 class ThreadsQueryParams(BaseModel):
   class Config:
