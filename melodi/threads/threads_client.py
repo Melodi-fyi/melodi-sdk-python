@@ -24,9 +24,15 @@ class ThreadsClient(BaseClient):
 
 
     def create(self, thread: Thread) -> ThreadResponse:
+        createdAtString = None
+        if (thread.createdAt):
+            createdAtString = thread.createdAt.isoformat()
+        threadjson = thread.dict(by_alias=True)
+        threadjson['createdAt'] = createdAtString
+
         try:
             response = requests.post(
-                self.endpoint, headers=self._get_headers(), json=thread.dict(by_alias=True)
+                self.endpoint, headers=self._get_headers(), json=threadjson
             )
             _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
@@ -35,9 +41,15 @@ class ThreadsClient(BaseClient):
             raise MelodiAPIError(e)
 
     def create_or_update(self, thread: Thread) -> ThreadResponse:
+        createdAtString = None
+        if (thread.createdAt):
+            createdAtString = thread.createdAt.isoformat()
+        threadjson = thread.dict(by_alias=True)
+        threadjson['createdAt'] = createdAtString
+
         try:
             response = requests.put(
-                self.endpoint, headers=self._get_headers(), json=thread.dict(by_alias=True)
+                self.endpoint, headers=self._get_headers(), json=threadjson
             )
             _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
