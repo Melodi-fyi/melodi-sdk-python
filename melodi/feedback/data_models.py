@@ -37,5 +37,5 @@ class FeedbackResponse(BaseFeedback):
     createdAt: datetime
     updatedAt: datetime
 
-class FeedbackUpdateRequest(Feedback):
+class FeedbackCreateOrUpdateRequest(Feedback):
     id: Optional[int] = None
