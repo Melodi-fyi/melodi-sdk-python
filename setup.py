@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='melodi',
-    version='0.1.17',
+    version='0.1.18',
     packages=find_packages(),
     install_requires=[
         'requests',

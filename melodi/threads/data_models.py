@@ -3,7 +3,7 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, Extra
 
-from melodi.messages.data_models import Message, MessageWithFeedback
+from melodi.messages.data_models import Message, MessageResponse
 from melodi.users.data_models import User, UserResponse
 
 
@@ -27,6 +27,8 @@ class ThreadsQueryParams(BaseModel):
   ids: Optional[List[int]] = None
   externalIds: Optional[List[str]] = None
   userSegmentIds: Optional[List[int]] = None
+  issueIds: Optional[List[int]] = None
+  intentIds: Optional[List[int]] = None
   search: Optional[str] = None
   hasFeedback: Optional[bool] = None
   includeFeedback: Optional[bool] = None
@@ -56,7 +58,7 @@ class ThreadsPagedResponse(BaseModel):
     rows: List[ThreadResponse]
 
 class ThreadResponseWithFeedback(ThreadResponse):
-    messages: List[MessageWithFeedback]
+    messages: List[MessageResponse]
 
 class ThreadsWithFeedbackPagedResponse(BaseModel):
     count: int

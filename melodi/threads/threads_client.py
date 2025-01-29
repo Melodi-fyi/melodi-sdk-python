@@ -77,6 +77,12 @@ class ThreadsClient(BaseClient):
         if (query_params.userSegmentIds):
             for userSegmentId in query_params.userSegmentIds:
                 url = f"{url}&userSegmentIds={userSegmentId}"
+        if (query_params.issueIds):
+            for issueId in query_params.issueIds:
+                url = f"{url}&issueIds={issueId}"
+        if (query_params.intentIds):
+            for intentId in query_params.intentIds:
+                url = f"{url}&intentId={intentId}"
         if (query_params.hasFeedback):
             url = f"{url}&hasFeedback={query_params.hasFeedback}"
         if (query_params.includeFeedback):
