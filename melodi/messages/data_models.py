@@ -27,11 +27,8 @@ class Message(BaseModel):
     content: Optional[str] = None
     jsonContent: Optional[Any] = None
     metadata: dict[str, Union[str, int]] = {}
-
-class MessageWithFeedback(Message):
-    externalFeedbackAssociations: List[FeedbackMessageAssociation]
-
 class MessageResponse(Message):
     id: int
     issueAssociations: List[IssueMessageAssociation]
     intentAssociations: List[IntentMessageAssociation]
+    externalFeedbackAssociations: List[FeedbackMessageAssociation]
