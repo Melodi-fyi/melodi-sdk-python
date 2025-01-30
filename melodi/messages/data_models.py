@@ -29,6 +29,6 @@ class Message(BaseModel):
     metadata: dict[str, Union[str, int]] = {}
 class MessageResponse(Message):
     id: int
-    issueAssociations: List[IssueMessageAssociation]
-    intentAssociations: List[IntentMessageAssociation]
-    externalFeedbackAssociations: List[FeedbackMessageAssociation]
+    issueAssociations: List[IssueMessageAssociation] = []
+    intentAssociations: List[IntentMessageAssociation] = []
+    externalFeedbackAssociations: List[FeedbackMessageAssociation] = []
