@@ -3,19 +3,22 @@ from typing import Any, List, Literal, Optional, Union
 from pydantic import BaseModel
 
 from melodi.feedback.data_models import FeedbackResponse
+from melodi.intents.data_models import IntentResponse
+from melodi.issues.data_models import IssueResponse
 
-
-class IssueMessageAssociation(BaseModel):
-    id: int
-    issueId: int
-    messageId: int
-    userId: int
 
 class IntentMessageAssociation(BaseModel):
     id: int
     intentId: int
     messageId: int
-    userId: int
+    userId: Optional[int] = None
+    intent: IntentResponse
+class IssueMessageAssociation(BaseModel):
+    id: int
+    issueId: int
+    messageId: int
+    userId: Optional[int] = None
+    issue: IssueResponse
 
 class FeedbackMessageAssociation(BaseModel):
     externalFeedback: FeedbackResponse
