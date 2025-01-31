@@ -8,8 +8,7 @@ from melodi.exceptions import MelodiAPIError
 from melodi.logging import _log_melodi_http_errors
 from melodi.threads.data_models import (Thread, ThreadResponse,
                                         ThreadsPagedResponse,
-                                        ThreadsQueryParams,
-                                        ThreadsWithFeedbackPagedResponse)
+                                        ThreadsQueryParams)
 
 
 class ThreadsClient(BaseClient):
@@ -57,7 +56,7 @@ class ThreadsClient(BaseClient):
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
-    def get(self, query_params: ThreadsQueryParams = ThreadsQueryParams()) -> ThreadsPagedResponse | ThreadsWithFeedbackPagedResponse:
+    def get(self, query_params: ThreadsQueryParams = ThreadsQueryParams()) -> ThreadsPagedResponse:
         url = f"{self.endpoint}&pageIndex={query_params.pageIndex}&pageSize={query_params.pageSize}"
 
         if (query_params.projectId):
@@ -87,15 +86,16 @@ class ThreadsClient(BaseClient):
             url = f"{url}&hasFeedback={query_params.hasFeedback}"
         if (query_params.includeFeedback):
             url = f"{url}&includeFeedback={query_params.includeFeedback}"
+        if (query_params.includeIntents):
+            url = f"{url}&includeIntents={query_params.includeIntents}"
+        if (query_params.includeIssues):
+            url = f"{url}&includeIssues={query_params.includeIssues}"
 
         try:
             response = requests.request("GET", url)
 
             _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
-
-            if (query_params.includeFeedback):
-                return parse_obj_as(ThreadsWithFeedbackPagedResponse, response.json())
 
             return parse_obj_as(ThreadsPagedResponse, response.json())
         except MelodiAPIError as e:

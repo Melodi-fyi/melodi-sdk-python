@@ -32,6 +32,8 @@ class ThreadsQueryParams(BaseModel):
   search: Optional[str] = None
   hasFeedback: Optional[bool] = None
   includeFeedback: Optional[bool] = None
+  includeIntents: Optional[bool] = None
+  includeIssues: Optional[bool] = None
   before: Optional[datetime] = None
   after: Optional[datetime] = None
 
@@ -48,6 +50,8 @@ class ThreadResponse(BaseModel):
 
     externalUser: Optional[UserResponse] = None
 
+    messages: List[MessageResponse]
+
     metadata: dict[str, Union[str, int]] = {}
 
     createdAt: datetime
@@ -56,10 +60,3 @@ class ThreadResponse(BaseModel):
 class ThreadsPagedResponse(BaseModel):
     count: int
     rows: List[ThreadResponse]
-
-class ThreadResponseWithFeedback(ThreadResponse):
-    messages: List[MessageResponse]
-
-class ThreadsWithFeedbackPagedResponse(BaseModel):
-    count: int
-    rows: List[ThreadResponseWithFeedback]
