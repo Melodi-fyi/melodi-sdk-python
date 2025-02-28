@@ -11,9 +11,5 @@ class ProjectResponse(BaseModel):
     userId: Optional[int] = None
     isDefault: bool
     isDeleted: bool
-    chainId: Optional[int] = None
-    chainDisplayOrder: Optional[int] = None
-    useCase: Optional[str] = None
-    notes: Optional[str] = None
     createdAt: datetime
     updatedAt: datetime
