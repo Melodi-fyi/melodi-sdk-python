@@ -9,7 +9,6 @@ class ProjectResponse(BaseModel):
     name: str
     organizationId: int
     userId: Optional[int] = None
-    isDefault: bool
     isDeleted: bool
     createdAt: datetime
     updatedAt: datetime
