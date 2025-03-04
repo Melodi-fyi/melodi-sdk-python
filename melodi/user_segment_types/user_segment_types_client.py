@@ -7,7 +7,7 @@ from pydantic import parse_obj_as
 from melodi.base_client import BaseClient
 from melodi.exceptions import MelodiAPIError
 from melodi.logging import _log_melodi_http_errors
-from melodi.user_segment_types.data_models import (UserSegmentDefinition,
+from melodi.user_segment_types.data_models import (UserSegmentTypeDefinition,
                                                    UserSegmentTypesQueryParams)
 
 
@@ -25,7 +25,7 @@ class UserSegmentTypesClient(BaseClient):
 
         self.logger = logging.getLogger(__name__)
 
-    def get(self, query_params: UserSegmentTypesQueryParams = UserSegmentTypesQueryParams()) -> List[UserSegmentDefinition]:
+    def get(self, query_params: UserSegmentTypesQueryParams = UserSegmentTypesQueryParams()) -> List[UserSegmentTypeDefinition]:
         url = self.endpoint
 
         if (query_params.projectId):
@@ -37,6 +37,6 @@ class UserSegmentTypesClient(BaseClient):
             _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
 
-            return parse_obj_as(List(UserSegmentDefinition), response.json())
+            return parse_obj_as(List(UserSegmentTypeDefinition), response.json())
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
