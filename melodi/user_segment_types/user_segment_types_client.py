@@ -37,6 +37,6 @@ class UserSegmentTypesClient(BaseClient):
             _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
 
-            return parse_obj_as(List(UserSegmentTypeDefinition), response.json())
+            return parse_obj_as(List[UserSegmentTypeDefinition], response.json())
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
