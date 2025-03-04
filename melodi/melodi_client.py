@@ -7,6 +7,8 @@ from melodi.feedback.feedback_client import FeedbackClient
 from melodi.messages.messages_client import MessagesClient
 from melodi.projects.projects_client import ProjectsClient
 from melodi.threads.threads_client import ThreadsClient
+from melodi.user_segment_types.user_segment_types_client import \
+    UserSegmentTypesClient
 from melodi.users.user_client import UserClient
 
 from .exceptions import MelodiAPIError
@@ -32,6 +34,7 @@ class MelodiClient:
         self.users = UserClient(base_url=self.base_url, api_key=self.api_key)
         self.messages = MessagesClient(base_url=self.base_url, api_key=self.api_key)
         self.experiments = ExperimentsClient(base_url=self.base_url, api_key=self.api_key)
+        self.user_segment_types = UserSegmentTypesClient(base_url=self.base_url, api_key=self.api_key)
 
         if verbose:
             logging.basicConfig(level=logging.INFO)
