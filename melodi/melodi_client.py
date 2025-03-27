@@ -2,7 +2,6 @@ import logging
 import os
 from typing import Optional
 
-from melodi.experiments.experiments_client import ExperimentsClient
 from melodi.feedback.feedback_client import FeedbackClient
 from melodi.messages.messages_client import MessagesClient
 from melodi.projects.projects_client import ProjectsClient
@@ -33,7 +32,6 @@ class MelodiClient:
         self.feedback = FeedbackClient(base_url=self.base_url, api_key=self.api_key)
         self.users = UserClient(base_url=self.base_url, api_key=self.api_key)
         self.messages = MessagesClient(base_url=self.base_url, api_key=self.api_key)
-        self.experiments = ExperimentsClient(base_url=self.base_url, api_key=self.api_key)
         self.user_segment_types = UserSegmentTypesClient(base_url=self.base_url, api_key=self.api_key)
 
         if verbose:
