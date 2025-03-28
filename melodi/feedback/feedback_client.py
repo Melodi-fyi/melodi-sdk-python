@@ -27,10 +27,16 @@ class FeedbackClient(BaseClient):
 
     def create(self, feedback: Feedback) -> FeedbackResponse:
         try:
+            createdAtString = None
+            if (feedback.createdAt):
+                createdAtString = feedback.createdAt.isoformat()
+            feedbackJson = feedback.dict(by_alias=True)
+            feedbackJson['createdAt'] = createdAtString
+
             response = requests.request(
                 "POST",
                 url=self.endpoint,
-                json=feedback.dict(by_alias=True),
+                json=feedbackJson,
                 headers=self._get_headers(),
             )
 
@@ -42,10 +48,16 @@ class FeedbackClient(BaseClient):
 
     def create_or_update(self, update: FeedbackCreateOrUpdateRequest) -> FeedbackResponse:
         try:
+            createdAtString = None
+            if (update.createdAt):
+                createdAtString = update.createdAt.isoformat()
+            feedbackJson = update.dict(by_alias=True)
+            feedbackJson['createdAt'] = createdAtString
+
             response = requests.request(
                 "PUT",
                 url=self.endpoint,
-                json=update.dict(by_alias=True),
+                json=feedbackJson,
                 headers=self._get_headers(),
             )
 
