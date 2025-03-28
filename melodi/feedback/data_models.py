@@ -17,6 +17,7 @@ class Feedback(BaseFeedback):
     externalUser: Optional[User] = None
 
     attributes: Optional[dict[str, str]] = {}
+    createdAt: Optional[datetime] = None
 
 class Attribute(BaseModel):
     id: int
