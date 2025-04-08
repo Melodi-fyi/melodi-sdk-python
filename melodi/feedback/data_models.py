@@ -11,6 +11,8 @@ class BaseFeedback(BaseModel):
     feedbackText: Optional[str] = None
 
 class Feedback(BaseFeedback):
+    projectId: Optional[int] = None
+
     externalThreadId: Optional[str] = None
     externalMessageId: Optional[str] = None
 
@@ -30,6 +32,7 @@ class AttributeOption(BaseModel):
 
 class FeedbackResponse(BaseFeedback):
     id: int
+    projectId: int
 
     externalUserId: Optional[int] = None
     externalUser: Optional[UserResponse] = None
