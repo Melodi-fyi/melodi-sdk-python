@@ -13,15 +13,13 @@ class IntentMessageAssociation(BaseModel):
     messageId: int
     userId: Optional[int] = None
     intent: IntentResponse
+
 class IssueMessageAssociation(BaseModel):
     id: int
     issueId: int
     messageId: int
     userId: Optional[int] = None
     issue: IssueResponse
-
-class FeedbackMessageAssociation(BaseModel):
-    externalFeedback: FeedbackResponse
 
 class Message(BaseModel):
     externalId: Optional[str] = None
@@ -30,8 +28,9 @@ class Message(BaseModel):
     content: Optional[str] = None
     jsonContent: Optional[Any] = None
     metadata: dict[str, Union[str, int]] = {}
+
 class MessageResponse(Message):
     id: int
     issueAssociations: List[IssueMessageAssociation] = []
     intentAssociations: List[IntentMessageAssociation] = []
-    externalFeedbackAssociations: List[FeedbackMessageAssociation] = []
+    externalFeedback: List[FeedbackResponse] = []
