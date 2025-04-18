@@ -7,6 +7,7 @@ from melodi.utils.openai_utils import (
     COMPLETION_USAGE_KEYS,
     COMPLETION_USAGE_TOKENS_KEYS,
     COMPLETION_USAGE_PROMPT_TOKENS_KEYS,
+    NON_STREAM_MESSAGE_KEYS, parse_metadata_value,
 )
 from melodi.utils.utils import create_melodi_thread
 
@@ -59,7 +60,7 @@ def _get_melodi_messages_from_openai_response(resource: OpenAiDefinition, respon
     response_metadata = _get_response_metadata(response)
     melodi_messages = []
     for message_dict in response_contents:
-        content = message_dict.pop("content")
+        content = message_dict.pop("content", None)
         metadata = {"type": "response"}
         metadata.update(**message_dict)
         metadata.update(**response_metadata)
@@ -94,59 +95,49 @@ def _extract_chat_response(choice_dict: dict):
         if not value:
             continue
 
-        response[message_key] = value
+        response[message_key] = parse_metadata_value(value)
 
     for choice_key in COMPLETION_CHOICE_KEYS:
         value = choice_dict.get(choice_key)
         if not value:
             continue
 
-        response[choice_key] = value
+        response[choice_key] = parse_metadata_value(value)
     return response
 
 
 def _get_response_metadata(response):
-    # TODO extract this
-    response_keys = [
-        "created",
-        "id",
-        "model",
-        "object",
-        "service_tier",
-        "system_fingerprint",
-    ]
-
     usage_dict = response.get("usage", {}).__dict__
     completion_tokens_dict = usage_dict.get("completion_tokens_details", {}).__dict__
     prompt_tokens_dict = usage_dict.get("prompt_tokens_details", {}).__dict__
 
     metadata = {}
-    for key in response_keys:
+    for key in NON_STREAM_MESSAGE_KEYS:
         value = response.get(key)
         if not value:
             continue
 
-        metadata[key] = value
+        metadata[key] = parse_metadata_value(value)
 
     for key in COMPLETION_USAGE_KEYS:
         value = usage_dict.get(key)
         if not value:
             continue
 
-        metadata[key] = value
+        metadata[key] = parse_metadata_value(value)
 
     for key in COMPLETION_USAGE_TOKENS_KEYS:
         value = completion_tokens_dict.get(key)
         if not value:
             continue
 
-        metadata[key] = value
+        metadata[key] = parse_metadata_value(value)
 
     for key in COMPLETION_USAGE_PROMPT_TOKENS_KEYS:
         value = prompt_tokens_dict.get(key)
         if not value:
             continue
 
-        metadata[key] = value
+        metadata[key] = parse_metadata_value(value)
 
     return metadata

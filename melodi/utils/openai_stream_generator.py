@@ -3,10 +3,10 @@ from collections import defaultdict
 from melodi.melodi_client import MelodiClient
 from melodi.messages.data_models import Message
 from melodi.utils.openai_utils import (
-    time_now,
     OpenAiDefinition,
     clean_dict_value,
     _is_openai_v1,
+    parse_metadata_value,
 )
 from melodi.utils.utils import create_melodi_thread
 
@@ -36,7 +36,7 @@ def _extract_streamed_openai_response(resource: OpenAiDefinition, chunks: list):
             if resource.type == "chat":
                 delta = choice.get("delta")
 
-                # The finish_reason is included only once
+                # The finish_reason is included only once, in the final one
                 finish_reason = choice.get("finish_reason")
 
                 if _is_openai_v1():
@@ -53,8 +53,7 @@ def _extract_streamed_openai_response(resource: OpenAiDefinition, chunks: list):
                         if completion["content"] is None
                         else completion["content"] + delta.get("content")
                     )
-
-                # TODO test for function_call and tool_call
+                # TODO this is deprecated
                 elif delta.get("function_call") is not None:
                     curr = completion["function_call"]
                     function_call_chunk = delta.get("function_call")
@@ -85,7 +84,6 @@ def _extract_streamed_openai_response(resource: OpenAiDefinition, chunks: list):
                                 "arguments": getattr(tool_call_chunk, "arguments", ""),
                             }
                         ]
-
                     elif getattr(tool_call_chunk, "name") is not None:
                         curr.append(
                             {
@@ -95,7 +93,6 @@ def _extract_streamed_openai_response(resource: OpenAiDefinition, chunks: list):
                                 ),
                             }
                         )
-
                     else:
                         curr[-1]["name"] = curr[-1]["name"] or getattr(
                             tool_call_chunk, "name", None
@@ -134,6 +131,7 @@ def _extract_streamed_openai_response(resource: OpenAiDefinition, chunks: list):
         "usage": usage,
         "finish_reason": finish_reason,
         "created_at": created_at,
+        "tool_calls": parse_metadata_value(completion.get("tool_calls")),
     }
 
     melodi_message = Message(
@@ -171,15 +169,11 @@ class MelodiResponseGeneratorSync:
         self.openai_response = openai_response
         self.melodi_client = melodi_client
         self.prompt_messages = prompt_messages
-        self.completion_start_time = None
 
     def __iter__(self):
         try:
             for i in self.openai_response:
                 self.items.append(i)
-
-                if self.completion_start_time is None:
-                    self.completion_start_time = time_now()
 
                 yield i
         finally:
@@ -189,9 +183,6 @@ class MelodiResponseGeneratorSync:
         try:
             item = self.openai_response.__next__()
             self.items.append(item)
-
-            if self.completion_start_time is None:
-                self.completion_start_time = time_now()
 
             return item
 
@@ -234,15 +225,11 @@ class MelodiResponseGeneratorAsync:
         self.openai_response = openai_response
         self.melodi_client = melodi_client
         self.prompt_messages = prompt_messages
-        self.completion_start_time = None
 
     async def __aiter__(self):
         try:
             async for i in self.openai_response:
                 self.items.append(i)
-
-                if self.completion_start_time is None:
-                    self.completion_start_time = time_now()
 
                 yield i
         finally:
@@ -252,9 +239,6 @@ class MelodiResponseGeneratorAsync:
         try:
             item = await self.openai_response.__anext__()
             self.items.append(item)
-
-            if self.completion_start_time is None:
-                self.completion_start_time = time_now()
 
             return item
 

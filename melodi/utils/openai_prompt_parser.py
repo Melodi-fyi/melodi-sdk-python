@@ -1,17 +1,23 @@
 from openai import NotGiven
 
 from melodi.messages.data_models import Message
-from melodi.utils.openai_utils import GENERATION_PARAMETERS_DEFAULTS
+from melodi.utils.openai_utils import (
+    GENERATION_PARAMETERS_DEFAULTS,
+    parse_metadata_value,
+    OpenAiDefinition,
+)
 
 
-def _get_melodi_messages_from_openai_prompt(kwargs, openai_resource):
+def _get_melodi_messages_from_openai_prompt(
+    kwargs: dict, openai_resource: OpenAiDefinition
+):
     """Convert the OpenAI prompt in Melodi messages."""
     if openai_resource.type == "completion":
         prompt = kwargs.get("prompt", {})
     elif openai_resource.type == "chat":
         prompt = _extract_chat_prompt(kwargs)
     else:
-        # TODO this should not happen, announce it's not supported
+        # Currently only chat and completion objects are supported
         return []
 
     if not prompt.get("messages"):
@@ -50,20 +56,20 @@ def _get_generation_metadata(kwargs: dict):
             if key_default_value is not None:
                 generation_metadata[key_param] = key_default_value
         else:
-            generation_metadata[key_param] = value
+            generation_metadata[key_param] = parse_metadata_value(value)
 
     return generation_metadata
 
 
-def _extract_chat_prompt(kwargs: any):
+def _extract_chat_prompt(kwargs: dict):
     """Return prompt messages and potential function calls for the prompt."""
     prompt = dict()
 
     for key in ["function_call", "functions", "tools"]:
-        if not prompt.get(key):
+        if not kwargs.get(key):
             continue
 
-        prompt[key] = kwargs.get(key)
+        prompt[key] = parse_metadata_value(kwargs.get(key))
 
     prompt_messages = [
         _process_prompt_message(message) for message in kwargs.get("messages", [])
