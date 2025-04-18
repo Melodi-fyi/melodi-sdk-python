@@ -6,8 +6,10 @@ from melodi.utils.openai_utils import (
     parse_metadata_value,
     OpenAiDefinition,
 )
+from melodi.utils.utils import handle_melodi_failure
 
 
+@handle_melodi_failure("Could not parse OpenAI prompt attributes")
 def _get_melodi_messages_from_openai_prompt(
     kwargs: dict, openai_resource: OpenAiDefinition
 ):

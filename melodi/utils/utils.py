@@ -7,9 +7,23 @@ from melodi.utils.openai_utils import time_now
 logger = logging.getLogger("melodi")
 
 
+def handle_melodi_failure(value):
+    def decorate(wrapped_func):
+        def applicator(*args, **kwargs):
+            try:
+                return wrapped_func(*args, **kwargs)
+            except Exception as e:
+                logger.error(f"{value}: {repr(e)}")
+                return
+
+        return applicator
+
+    return decorate
+
+
+@handle_melodi_failure("Could not create a Melodi thread")
 def create_melodi_thread(melodi_client, melodi_messages, response_id, prompt_messages):
     logger.info("Creating Melodi thread ...")
-    print("Creating Melodi thread ...")
     thread_metadata = {
         "created": time_now(as_string=True),
         "response_id": response_id,
@@ -23,12 +37,11 @@ def create_melodi_thread(melodi_client, melodi_messages, response_id, prompt_mes
     )
     melodi_client.threads.create(thread)
     logger.info("Done creating Melodi thread.")
-    print("Done creating Melodi thread.")
 
 
+@handle_melodi_failure("Could not create a Melodi thread")
 def create_error_melodi_thread(melodi_client, prompt_messages, model, exception):
     logger.warning("Creating Melodi error thread ...")
-    print("Creating Melodi error thread ...")
     metadata = {
         "completion_tokens": 0,
         "prompt_tokens": 0,
@@ -45,4 +58,3 @@ def create_error_melodi_thread(melodi_client, prompt_messages, model, exception)
     )
     melodi_client.threads.create(melodi_error_thread)
     logger.warning("Done creating Melodi error thread.")
-    print("Done creating Melodi error thread.")

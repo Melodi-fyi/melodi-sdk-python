@@ -9,9 +9,10 @@ from melodi.utils.openai_utils import (
     COMPLETION_USAGE_PROMPT_TOKENS_KEYS,
     NON_STREAM_MESSAGE_KEYS, parse_metadata_value,
 )
-from melodi.utils.utils import create_melodi_thread
+from melodi.utils.utils import create_melodi_thread, handle_melodi_failure
 
 
+@handle_melodi_failure("Could not create a Melodi thread")
 def create_melodi_thread_from_openai_response(
     openai_resource: OpenAiDefinition,
     openai_response,

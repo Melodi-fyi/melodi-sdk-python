@@ -34,7 +34,7 @@ class OpenAiDefinition:
     min_version: Optional[str] = None
 
 
-OPENAI_METHODS_V0 = [
+OPENAI_CLIENTS_V0 = [
     OpenAiDefinition(
         module="openai",
         object="ChatCompletion",
@@ -51,7 +51,7 @@ OPENAI_METHODS_V0 = [
     ),
 ]
 
-OPENAI_METHODS_V1 = [
+OPENAI_CLIENTS_V1 = [
     OpenAiDefinition(
         module="openai.resources.chat.completions",
         object="Completions",
@@ -187,7 +187,7 @@ def parse_metadata_value(input_value):
         return str(input_value)
 
     if isinstance(input_value, list) or isinstance(input_value, dict):
-        return dump_dict_to_str(input_dict=input_value)
+        return json.dumps(input_value)
 
     logger.info(f"Could not parse metadata value: {input_value}")
     return None
@@ -210,7 +210,3 @@ def strip_openai_objects(input_value):
 
     input_value = input_value.__dict__
     return {key: strip_openai_objects(value) for key, value in input_value.items()}
-
-
-def dump_dict_to_str(input_dict):
-    return json.dumps(input_dict)
