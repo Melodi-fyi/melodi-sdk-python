@@ -8,9 +8,6 @@ adding automatic logging with minimal code changes. Simply update your import:
 - import openai
 + from melodi.openai import openai
 ```
-
-Features:
-* TODO
 """
 
 import logging
@@ -32,12 +29,12 @@ from melodi.utils.openai_stream_generator import (
     MelodiResponseGeneratorAsync,
 )
 from melodi.utils.openai_utils import (
-    _is_openai_v1,
+    OPENAI_CLIENTS_V0,
+    OPENAI_CLIENTS_V1,
     OpenAiDefinition,
-    OPENAI_METHODS_V1,
-    OPENAI_METHODS_V0,
-    _is_streaming_response,
     OpenAiKwargsExtractor,
+    _is_openai_v1,
+    _is_streaming_response,
 )
 from melodi.utils.utils import create_error_melodi_thread
 
@@ -87,12 +84,15 @@ def _wrap(
         openai_response = wrapped(**arg_extractor.get_openai_args())
 
         if _is_streaming_response(openai_response):
-            return MelodiResponseGeneratorSync(
-                openai_resource=openai_resource,
-                openai_response=openai_response,
-                melodi_client=melodi_client,
-                prompt_messages=prompt_messages,
-            )
+            try:
+                return MelodiResponseGeneratorSync(
+                    openai_resource=openai_resource,
+                    openai_response=openai_response,
+                    melodi_client=melodi_client,
+                    prompt_messages=prompt_messages,
+                )
+            except Exception as ex:
+                logger.error(f"Could not create Melodi thread out of streamed response: {repr(ex)}")
         else:
             create_melodi_thread_from_openai_response(
                 openai_resource=openai_resource,
@@ -129,12 +129,15 @@ async def _wrap_async(
         openai_response = await wrapped(**arg_extractor.get_openai_args())
 
         if _is_streaming_response(openai_response):
-            return MelodiResponseGeneratorAsync(
-                openai_resource=openai_resource,
-                openai_response=openai_response,
-                melodi_client=melodi_client,
-                prompt_messages=prompt_messages,
-            )
+            try:
+                return MelodiResponseGeneratorAsync(
+                    openai_resource=openai_resource,
+                    openai_response=openai_response,
+                    melodi_client=melodi_client,
+                    prompt_messages=prompt_messages,
+                )
+            except Exception as ex:
+                logger.error(f"Could not create Melodi thread out of streamed response: {repr(ex)}")
         else:
             create_melodi_thread_from_openai_response(
                 openai_resource=openai_resource,
@@ -160,12 +163,14 @@ class OpenAIMelodi:
 
     def initialize(self):
         if self.melodi_client is None:
-            self.melodi_client = MelodiClient(api_key=os.getenv("MELODI_API_KEY"))
+            self.melodi_client = MelodiClient(
+                api_key=os.getenv("MELODI_API_KEY"), verbose=True
+            )
 
         return self.melodi_client
 
     def register_tracing(self):
-        resources = OPENAI_METHODS_V1 if _is_openai_v1() else OPENAI_METHODS_V0
+        resources = OPENAI_CLIENTS_V1 if _is_openai_v1() else OPENAI_CLIENTS_V0
 
         for resource in resources:
             if resource.min_version is not None and Version(
