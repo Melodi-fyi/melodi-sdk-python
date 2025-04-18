@@ -1,3 +1,5 @@
+import json
+import logging
 from dataclasses import dataclass
 from typing import Optional
 
@@ -6,6 +8,9 @@ import openai.resources
 from packaging.version import Version
 
 from datetime import datetime, timezone
+
+
+logger = logging.getLogger(__name__)
 
 
 class OpenAiKwargsExtractor:
@@ -46,7 +51,6 @@ OPENAI_METHODS_V0 = [
     ),
 ]
 
-# TODO this and the above needs thorough testing
 OPENAI_METHODS_V1 = [
     OpenAiDefinition(
         module="openai.resources.chat.completions",
@@ -76,6 +80,15 @@ OPENAI_METHODS_V1 = [
         type="completion",
         sync=False,
     ),
+]
+
+NON_STREAM_MESSAGE_KEYS = [
+    "created",
+    "id",
+    "model",
+    "object",
+    "service_tier",
+    "system_fingerprint",
 ]
 
 COMPLETION_CHOICE_KEYS = [
@@ -162,3 +175,42 @@ def clean_dict_value(d):
     if not isinstance(d, dict):
         return d if d else False  # use a custom test if needed
     return {key: v for key, value in d.items() if (v := clean_dict_value(value))}
+
+
+def parse_metadata_value(input_value):
+    input_value = strip_openai_objects(input_value)
+
+    if isinstance(input_value, int) or isinstance(input_value, str):
+        return input_value
+
+    if isinstance(input_value, float):
+        return str(input_value)
+
+    if isinstance(input_value, list) or isinstance(input_value, dict):
+        return dump_dict_to_str(input_dict=input_value)
+
+    logger.info(f"Could not parse metadata value: {input_value}")
+    return None
+
+
+def strip_openai_objects(input_value):
+    if (
+        input_value is None
+        or isinstance(input_value, int)
+        or isinstance(input_value, str)
+        or isinstance(input_value, float)
+    ):
+        return input_value
+
+    if isinstance(input_value, list):
+        return [strip_openai_objects(element) for element in input_value]
+
+    if isinstance(input_value, dict):
+        return {key: strip_openai_objects(value) for key, value in input_value.items()}
+
+    input_value = input_value.__dict__
+    return {key: strip_openai_objects(value) for key, value in input_value.items()}
+
+
+def dump_dict_to_str(input_dict):
+    return json.dumps(input_dict)
