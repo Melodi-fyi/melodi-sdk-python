@@ -8,7 +8,7 @@ from melodi.base_client import BaseClient
 from melodi.exceptions import MelodiAPIError
 from melodi.logging import _log_melodi_http_errors
 from melodi.user_internal_for_project.data_models import (
-    BulkUserInternalForProjectRequest, UserInternalForProjectResponse)
+    BulkUserInternalForProjectRequest, BulkUserInternalForProjectResponse)
 
 
 class UserInternalForProjectClient(BaseClient):
@@ -25,7 +25,7 @@ class UserInternalForProjectClient(BaseClient):
 
         self.logger = logging.getLogger(__name__)
 
-    def set_users_internal(self, project_id: int, user_ids: List[int]) -> List[UserInternalForProjectResponse]:
+    def set_users_internal(self, project_id: int, user_ids: List[int]) -> BulkUserInternalForProjectResponse:
         url = self.endpoint
 
         request = BulkUserInternalForProjectRequest(
@@ -39,7 +39,7 @@ class UserInternalForProjectClient(BaseClient):
             _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
 
-            return parse_obj_as(List[UserInternalForProjectResponse], response.json())
+            return parse_obj_as(BulkUserInternalForProjectResponse, response.json())
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 

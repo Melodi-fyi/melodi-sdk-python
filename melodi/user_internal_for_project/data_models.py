@@ -11,8 +11,5 @@ class BulkUserInternalForProjectRequest(BaseModel):
   externalUserIds: List[int]
 
 
-class UserInternalForProjectResponse(BaseModel):
-  organizationId: int
-  projectId: int
-  externalUserId: int
-  setByUserId: int
+class BulkUserInternalForProjectResponse(BaseModel):
+  count: int
