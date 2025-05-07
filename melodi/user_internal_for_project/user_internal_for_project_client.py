@@ -17,7 +17,7 @@ class UserInternalForProjectClient(BaseClient):
         self.base_url = base_url
 
         self.base_endpoint = (
-            self.base_url + "/api/external/user-internal-for-project"
+            self.base_url + "/api/external/user-internal-for-project/bulk"
         )
         self.endpoint = (
             self.base_endpoint + f"?apiKey={self.api_key}"
@@ -30,11 +30,11 @@ class UserInternalForProjectClient(BaseClient):
 
         request = BulkUserInternalForProjectRequest(
             projectId=project_id,
-            userIds=user_ids
+            externalUserIds=user_ids
         )
 
         try:
-            response = requests.request("POST", url, json=request.model_dump())
+            response = requests.request("POST", url, json=request.dict(by_alias=True))
 
             _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()
@@ -43,16 +43,16 @@ class UserInternalForProjectClient(BaseClient):
         except MelodiAPIError as e:
             raise MelodiAPIError(e)
 
-    def set_user_not_internal(self, project_id: int, user_ids: List[int]) -> None:
+    def set_users_not_internal(self, project_id: int, user_ids: List[int]) -> None:
         url = self.endpoint
 
         request = BulkUserInternalForProjectRequest(
             projectId=project_id,
-            userIds=user_ids
+            externalUserIds=user_ids
         )
 
         try:
-            response = requests.request("DELETE", url, json=request.model_dump())
+            response = requests.request("DELETE", url, json=request.dict(by_alias=True))
 
             _log_melodi_http_errors(self.logger, response)
             response.raise_for_status()

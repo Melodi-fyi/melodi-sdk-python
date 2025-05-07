@@ -8,7 +8,7 @@ class BulkUserInternalForProjectRequest(BaseModel):
     extra = Extra.forbid
 
   projectId: int
-  userIds: List[int]
+  externalUserIds: List[int]
 
 
 class UserInternalForProjectResponse(BaseModel):
