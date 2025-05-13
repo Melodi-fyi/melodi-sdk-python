@@ -3,6 +3,8 @@ import os
 from typing import Optional
 
 from melodi.feedback.feedback_client import FeedbackClient
+from melodi.intents.intents_client import IntentsClient
+from melodi.issues.issues_client import IssuesClient
 from melodi.messages.messages_client import MessagesClient
 from melodi.projects.projects_client import ProjectsClient
 from melodi.threads.threads_client import ThreadsClient
@@ -36,6 +38,8 @@ class MelodiClient:
         self.messages = MessagesClient(base_url=self.base_url, api_key=self.api_key)
         self.user_segment_types = UserSegmentTypesClient(base_url=self.base_url, api_key=self.api_key)
         self.user_internal_for_project = UserInternalForProjectClient(base_url=self.base_url, api_key=self.api_key)
+        self.issues = IssuesClient(base_url=self.base_url, api_key=self.api_key)
+        self.intents = IntentsClient(base_url=self.base_url, api_key=self.api_key)
 
         if verbose:
             logging.basicConfig(level=logging.INFO)
