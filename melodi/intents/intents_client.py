@@ -21,7 +21,7 @@ class IntentsClient(BaseClient):
 
     def upsert(self, intentUpsertRequest: IntentUpsertRequest) -> IntentResponse:
         try:
-            response = requests.post(
+            response = requests.put(
                 self.endpoint, headers=self._get_headers(), json=intentUpsertRequest.dict(by_alias=True)
             )
 

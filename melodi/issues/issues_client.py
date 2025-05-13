@@ -21,7 +21,7 @@ class IssuesClient(BaseClient):
 
     def upsert(self, issueUpsertRequest: IssueUpsertRequest) -> IssueResponse:
         try:
-            response = requests.post(
+            response = requests.put(
                 self.endpoint, headers=self._get_headers(), json=issueUpsertRequest.dict(by_alias=True)
             )
 
