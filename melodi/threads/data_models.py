@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 
 from pydantic import BaseModel, Extra
 
@@ -31,6 +31,8 @@ class ThreadsQueryParams(BaseModel):
   intentIds: Optional[List[int]] = None
   search: Optional[str] = None
   hasFeedback: Optional[bool] = None
+  feedbackType: Optional[Literal['POSITIVE', 'NEGATIVE']]= None
+  attributeOptionIds: Optional[List[int]]
   includeFeedback: Optional[bool] = None
   includeIntents: Optional[bool] = None
   includeIssues: Optional[bool] = None

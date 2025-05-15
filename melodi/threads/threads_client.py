@@ -84,6 +84,11 @@ class ThreadsClient(BaseClient):
                 url = f"{url}&intentId={intentId}"
         if (query_params.hasFeedback):
             url = f"{url}&hasFeedback={query_params.hasFeedback}"
+        if (query_params.feedbackType):
+            url = f"{url}&feedbackType={query_params.feedbackType}"
+        if (query_params.attributeOptionIds):
+            for attributeOptionId in query_params.attributeOptionIds:
+                url = f"{url}&attributeOptionIds={attributeOptionId}"
         if (query_params.includeFeedback):
             url = f"{url}&includeFeedback={query_params.includeFeedback}"
         if (query_params.includeIntents):
