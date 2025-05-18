@@ -104,28 +104,6 @@ def _extract_streamed_openai_response(resource: OpenAiDefinition, chunks: list):
             if resource.type == "completion":
                 completion["content"] += choice.get("text", "")
 
-    def get_response_for_chat():
-        return (
-            completion["content"]
-            or (
-                completion["function_call"]
-                and {
-                    "role": "assistant",
-                    "function_call": completion["function_call"],
-                }
-            )
-            or (
-                completion["tool_calls"]
-                and {
-                    "role": "assistant",
-                    "tool_calls": [
-                        {"function": data} for data in completion["tool_calls"]
-                    ],
-                }
-            )
-            or None
-        )
-
     message_metadata = {
         "model": model,
         "usage": usage,

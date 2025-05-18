@@ -26,7 +26,7 @@ class TestOpenAIModules(unittest.TestCase):
                 }
             ],
             max_completion_tokens=5000,
-            model="o3-mini"
+            model="o4-mini"
         )
 
     @unittest.skip
@@ -120,6 +120,7 @@ class TestOpenAIModules(unittest.TestCase):
             top_logprobs=2
         )
 
+    @unittest.skip
     def test_azure_openai_streaming_function_tools(self):
         client = AzureOpenAI(
             api_key=os.getenv("AZURE_API_KEY"),

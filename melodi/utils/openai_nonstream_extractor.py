@@ -20,10 +20,8 @@ def create_melodi_thread_from_openai_response(
     prompt_messages: list,
 ):
     melodi_messages, response_id = _get_melodi_messages_from_openai_response(
-        openai_resource,
-        (openai_response and openai_response.__dict__)
-        if _is_openai_v1()
-        else openai_response,
+        resource=openai_resource,
+        response=openai_response
     )
     create_melodi_thread(
         melodi_client=melodi_client,
@@ -50,9 +48,9 @@ def _get_melodi_messages_from_openai_response(resource: OpenAiDefinition, respon
     elif resource.type == "chat":
         choices = response.get("choices", [])
         # If multiple choices were generated, we'll show all of them in the UI as a list.
-        if len(choices) >= 1:
+        if len(choices) > 0:
             response_contents = [
-                _extract_chat_response(choice.__dict__)
+                _extract_chat_response(to_dict(choice))
                 if _is_openai_v1()
                 else _extract_chat_base_response(choice.get("message"))
                 for choice in choices
@@ -86,21 +84,21 @@ def _extract_chat_base_response(content: str):
 
 def _extract_chat_response(choice_dict: dict):
     """Extracts the message content from an OpenAI choice."""
-    message_dict = choice_dict.get("message", {}).__dict__
+    message_dict = to_dict(choice_dict.get("message", {}))
     if not message_dict:
         return {}
 
     response = {}
     for message_key in COMPLETION_CHOICE_MESSAGE_KEYS:
         value = message_dict.get(message_key)
-        if not value:
+        if value is None:
             continue
 
         response[message_key] = parse_metadata_value(value)
 
     for choice_key in COMPLETION_CHOICE_KEYS:
         value = choice_dict.get(choice_key)
-        if not value:
+        if value is None:
             continue
 
         response[choice_key] = parse_metadata_value(value)
@@ -108,28 +106,28 @@ def _extract_chat_response(choice_dict: dict):
 
 
 def _get_response_metadata(response):
-    usage_dict = response.get("usage", {}).__dict__
-    completion_tokens_dict = usage_dict.get("completion_tokens_details", {}).__dict__
-    prompt_tokens_dict = usage_dict.get("prompt_tokens_details", {}).__dict__
+    usage_dict = to_dict(response.get("usage", {}))
+    completion_tokens_dict = to_dict(usage_dict.get("completion_tokens_details", {}))
+    prompt_tokens_dict = to_dict(usage_dict.get("prompt_tokens_details", {}))
 
     metadata = {}
     for key in NON_STREAM_MESSAGE_KEYS:
         value = response.get(key)
-        if not value:
+        if value is None:
             continue
 
         metadata[key] = parse_metadata_value(value)
 
     for key in COMPLETION_USAGE_KEYS:
         value = usage_dict.get(key)
-        if not value:
+        if value is None:
             continue
 
         metadata[key] = parse_metadata_value(value)
 
     for key in COMPLETION_USAGE_TOKENS_KEYS:
         value = completion_tokens_dict.get(key)
-        if not value:
+        if value is None:
             continue
 
         metadata[key] = parse_metadata_value(value)
@@ -142,3 +140,10 @@ def _get_response_metadata(response):
         metadata[key] = parse_metadata_value(value)
 
     return metadata
+
+
+def to_dict(input_value):
+    if isinstance(input_value, dict):
+        return input_value
+
+    return input_value.__dict__
