@@ -14,8 +14,6 @@ import logging
 import os
 from typing import Optional, Callable
 
-import openai.resources
-
 from packaging.version import Version
 from wrapt import wrap_function_wrapper
 
