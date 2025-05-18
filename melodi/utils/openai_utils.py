@@ -107,8 +107,6 @@ COMPLETION_CHOICE_MESSAGE_KEYS = [
 ]
 
 COMPLETION_USAGE_KEYS = [
-    "completion_tokens",
-    "prompt_tokens",
     "total_tokens",
 ]
 
