@@ -32,7 +32,7 @@ class ThreadsQueryParams(BaseModel):
   search: Optional[str] = None
   hasFeedback: Optional[bool] = None
   feedbackType: Optional[Literal['POSITIVE', 'NEGATIVE']]= None
-  attributeOptionIds: Optional[List[int]]
+  attributeOptionIds: Optional[List[int]] = None
   includeFeedback: Optional[bool] = None
   includeIntents: Optional[bool] = None
   includeIssues: Optional[bool] = None
