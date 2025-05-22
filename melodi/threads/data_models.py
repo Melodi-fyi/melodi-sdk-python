@@ -54,6 +54,7 @@ class ThreadResponse(BaseModel):
 
     messages: List[MessageResponse]
 
+    outcome: Optional[str] = None
     metadata: dict[str, Union[str, int]] = {}
 
     createdAt: datetime
