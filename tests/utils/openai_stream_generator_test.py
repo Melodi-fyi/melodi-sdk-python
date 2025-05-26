@@ -1,8 +1,12 @@
 import unittest
 from dataclasses import dataclass
 from typing import Optional
+from unittest.mock import patch, MagicMock
 
-from melodi.utils.openai_stream_generator import _extract_streamed_openai_response
+from melodi.utils.openai_stream_generator import (
+    _extract_streamed_openai_response,
+    MelodiResponseGeneratorSync,
+)
 from melodi.utils.openai_utils import OpenAiDefinition
 
 
@@ -391,6 +395,142 @@ class TestOpenAIStreamExtractorTests(unittest.TestCase):
             },
         )
         self.assertEqual(response_id, "chatcmpl-BbWigtG2AjFsEEXkAzbBlmiAL8sfz")
+
+    @patch("melodi.utils.openai_stream_generator.create_melodi_thread")
+    def test_melodi_response_generator_sync(self, mock_melodi_thread):
+        melodi_client_mock = MagicMock()
+        result = MelodiResponseGeneratorSync(
+            openai_resource=OpenAiDefinition(
+                module="openai",
+                object="ChatCompletion",
+                method="create",
+                type="chat",
+                sync=True,
+            ),
+            openai_response=[],
+            melodi_client=melodi_client_mock,
+            prompt_messages=[],
+        )
+        self.assertEqual(len(mock_melodi_thread.mock_calls), 0)
+
+        for _ in result:
+            pass
+        self.assertEqual(len(mock_melodi_thread.mock_calls), 1)
+        _, _, kwargs = mock_melodi_thread.mock_calls[0]
+        self.assertEqual(kwargs["melodi_client"], melodi_client_mock)
+        self.assertEqual(kwargs["melodi_messages"], [None])
+        self.assertEqual(kwargs["response_id"], None)
+        self.assertEqual(kwargs["prompt_messages"], [])
+
+        result = MelodiResponseGeneratorSync(
+            openai_resource=OpenAiDefinition(
+                module="openai",
+                object="ChatCompletion",
+                method="create",
+                type="chat",
+                sync=True,
+            ),
+            openai_response=self.openai_mock_response,
+            melodi_client=melodi_client_mock,
+            prompt_messages=[],
+        )
+        for _ in result:
+            pass
+        self.assertEqual(len(mock_melodi_thread.mock_calls), 2)
+        _, _, kwargs = mock_melodi_thread.mock_calls[1]
+        self.assertEqual(kwargs["melodi_client"], melodi_client_mock)
+        self.assertEqual(len(kwargs["melodi_messages"]), 1)
+        self.assertEqual(
+            kwargs["melodi_messages"][0].externalId,
+            "chatcmpl-BbWigtG2AjFsEEXkAzbBlmiAL8sfz",
+        )
+        self.assertEqual(kwargs["melodi_messages"][0].type, "markdown")
+        self.assertEqual(kwargs["melodi_messages"][0].role, "Assistant")
+        self.assertEqual(
+            kwargs["melodi_messages"][0].content,
+            "this is meant to be a streamed response",
+        )
+        self.assertEqual(kwargs["melodi_messages"][0].jsonContent, None)
+        self.assertEqual(
+            kwargs["melodi_messages"][0].metadata,
+            {
+                "model": "o4-mini-2025-04-16",
+                "finish_reason": "stop",
+                "created_at": 1748283610,
+            },
+        )
+        self.assertEqual(
+            kwargs["response_id"], "chatcmpl-BbWigtG2AjFsEEXkAzbBlmiAL8sfz"
+        )
+        self.assertEqual(kwargs["prompt_messages"], [])
+
+    @patch("melodi.utils.openai_stream_generator.create_melodi_thread")
+    def test_melodi_response_generator_async(self, mock_melodi_thread):
+        melodi_client_mock = MagicMock()
+        result = MelodiResponseGeneratorSync(
+            openai_resource=OpenAiDefinition(
+                module="openai",
+                object="ChatCompletion",
+                method="create",
+                type="chat",
+                sync=False,
+            ),
+            openai_response=[],
+            melodi_client=melodi_client_mock,
+            prompt_messages=[],
+        )
+        self.assertEqual(len(mock_melodi_thread.mock_calls), 0)
+
+        for _ in result:
+            pass
+        self.assertEqual(len(mock_melodi_thread.mock_calls), 1)
+        _, _, kwargs = mock_melodi_thread.mock_calls[0]
+        self.assertEqual(kwargs["melodi_client"], melodi_client_mock)
+        self.assertEqual(kwargs["melodi_messages"], [None])
+        self.assertEqual(kwargs["response_id"], None)
+        self.assertEqual(kwargs["prompt_messages"], [])
+
+        result = MelodiResponseGeneratorSync(
+            openai_resource=OpenAiDefinition(
+                module="openai",
+                object="ChatCompletion",
+                method="create",
+                type="chat",
+                sync=False,
+            ),
+            openai_response=self.openai_mock_response,
+            melodi_client=melodi_client_mock,
+            prompt_messages=[],
+        )
+        for _ in result:
+            pass
+        self.assertEqual(len(mock_melodi_thread.mock_calls), 2)
+        _, _, kwargs = mock_melodi_thread.mock_calls[1]
+        self.assertEqual(kwargs["melodi_client"], melodi_client_mock)
+        self.assertEqual(len(kwargs["melodi_messages"]), 1)
+        self.assertEqual(
+            kwargs["melodi_messages"][0].externalId,
+            "chatcmpl-BbWigtG2AjFsEEXkAzbBlmiAL8sfz",
+        )
+        self.assertEqual(kwargs["melodi_messages"][0].type, "markdown")
+        self.assertEqual(kwargs["melodi_messages"][0].role, "Assistant")
+        self.assertEqual(
+            kwargs["melodi_messages"][0].content,
+            "this is meant to be a streamed response",
+        )
+        self.assertEqual(kwargs["melodi_messages"][0].jsonContent, None)
+        self.assertEqual(
+            kwargs["melodi_messages"][0].metadata,
+            {
+                "model": "o4-mini-2025-04-16",
+                "finish_reason": "stop",
+                "created_at": 1748283610,
+            },
+        )
+        self.assertEqual(
+            kwargs["response_id"], "chatcmpl-BbWigtG2AjFsEEXkAzbBlmiAL8sfz"
+        )
+        self.assertEqual(kwargs["prompt_messages"], [])
 
 
 if __name__ == "__main__":
