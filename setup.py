@@ -14,6 +14,9 @@ setup(
         'pydantic',
         'email-validator'
     ],
+    extra_require={
+        'openai': ['openai', 'wrapt'],
+    },
     author='Melodi Ltd',
     author_email='info@melodi.fyi',
     description='Helper functions for Melodi',
