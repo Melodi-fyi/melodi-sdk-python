@@ -169,7 +169,7 @@ class TestOpenAIModules(unittest.TestCase):
         )
 
         stream = client.chat.completions.create(
-            model="o3-mini",
+            model="o4-mini",
             messages=[
                 {
                     "role": "user",
@@ -178,8 +178,6 @@ class TestOpenAIModules(unittest.TestCase):
             ],
             stream=True,
             n=1,
-            logprobs=True,
-            presence_penalty=1,
         )
 
         for event in stream:
