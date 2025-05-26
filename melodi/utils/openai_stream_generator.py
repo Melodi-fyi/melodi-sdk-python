@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from melodi.melodi_client import MelodiClient
 from melodi.messages.data_models import Message
+from melodi.utils.openai_nonstream_extractor import to_dict
 from melodi.utils.openai_utils import (
     OpenAiDefinition,
     clean_dict_value,
@@ -12,20 +13,21 @@ from melodi.utils.utils import create_melodi_thread
 
 
 def _extract_streamed_openai_response(resource: OpenAiDefinition, chunks: list):
+    if not chunks:
+        return None, None
+
     if resource.type == "chat":
         completion = defaultdict(str)
     else:
         completion = {"role": "assistant", "content": ""}
     response_id, model, usage, finish_reason, created_at = None, None, None, None, None
-
-    # TODO this does not solve for the usecase of more than 1 versions being returned
     for chunk in chunks:
         if _is_openai_v1():
             chunk = chunk.__dict__
 
         model = chunk.get("model")
         response_id = chunk.get("id")
-        usage = get_streamed_usage_metadata(chunk.get("usage"))
+        usage = to_dict(chunk.get("usage"))
         created_at = chunk.get("created")
 
         choices = chunk.get("choices", [])
@@ -114,22 +116,12 @@ def _extract_streamed_openai_response(resource: OpenAiDefinition, chunks: list):
 
     melodi_message = Message(
         externalId=response_id,
-        role=completion["role"].title(),
-        content=completion["content"],
+        role=completion["role"].title() if completion["role"] else None,
+        content=completion["content"] if completion["role"] else None,
         metadata=clean_dict_value(message_metadata),
     )
 
     return melodi_message, response_id
-
-
-def get_streamed_usage_metadata(usage_dict):
-    if not usage_dict:
-        return None
-
-    if not isinstance(usage_dict, dict):
-        usage_dict = usage_dict.__dict__
-
-    return usage_dict
 
 
 class MelodiResponseGeneratorSync:
