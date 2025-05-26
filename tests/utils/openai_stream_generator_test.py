@@ -11,6 +11,28 @@ from melodi.utils.openai_utils import OpenAiDefinition
 
 
 @dataclass
+class ChoiceDeltaToolCallFunction:
+    """Testing class which mirrors OpenAI's objects."""
+
+    arguments: str
+    name: Optional[str]
+
+
+@dataclass
+class ChoiceDeltaToolCall:
+    """Testing class which mirrors OpenAI's objects."""
+
+    index: int
+    id: Optional[str]
+    function: Optional[ChoiceDeltaToolCallFunction]
+    index: Optional[int]
+    type: Optional[str]
+    logprobs: Optional[list] = None
+    content_filter_results: Optional[dict] = None
+    finish_reason: Optional[str] = None
+
+
+@dataclass
 class ChoiceDelta:
     """Testing class which mirrors OpenAI's objects."""
 
@@ -18,7 +40,7 @@ class ChoiceDelta:
     function_call: Optional[str]
     refusal: Optional[str]
     role: Optional[str]
-    tool_calls: Optional[str]
+    tool_calls: Optional[list]
 
 
 @dataclass
@@ -48,6 +70,253 @@ class ChatCompletionChunk:
 
 
 class TestOpenAIStreamExtractorTests(unittest.TestCase):
+
+    openai_mock_response_function_call = [
+        ChatCompletionChunk(
+            id="",
+            choices=[],
+            created=0,
+            model="",
+            object="",
+            service_tier=None,
+            system_fingerprint=None,
+            usage=None,
+            prompt_filter_results=[
+                {
+                    "prompt_index": 0,
+                    "content_filter_results": {
+                        "hate": {"filtered": False, "severity": "safe"},
+                        "jailbreak": {"filtered": False, "detected": False},
+                        "self_harm": {"filtered": False, "severity": "safe"},
+                        "sexual": {"filtered": False, "severity": "safe"},
+                        "violence": {"filtered": False, "severity": "safe"},
+                    },
+                }
+            ],
+        ),
+        ChatCompletionChunk(
+            id="chatcmpl-BbYEdy7cBIbJsbLXouL7Z47t93LUR",
+            choices=[
+                Choice(
+                    delta=ChoiceDelta(
+                        content=None,
+                        function_call=None,
+                        refusal=None,
+                        role="assistant",
+                        tool_calls=[
+                            ChoiceDeltaToolCall(
+                                index=0,
+                                id="call_nuMz0OzAFocR9il88r5794xN",
+                                function=ChoiceDeltaToolCallFunction(
+                                    arguments="", name="get_current_weather"
+                                ),
+                                type="function",
+                            )
+                        ],
+                    ),
+                    finish_reason=None,
+                    index=0,
+                    logprobs=None,
+                    content_filter_results={},
+                )
+            ],
+            created=1748289435,
+            model="gpt-4.1-2025-04-14",
+            object="chat.completion.chunk",
+            service_tier=None,
+            system_fingerprint="fp_07e970ab25",
+            usage=None,
+        ),
+        ChatCompletionChunk(
+            id="chatcmpl-BbYEdy7cBIbJsbLXouL7Z47t93LUR",
+            choices=[
+                Choice(
+                    delta=ChoiceDelta(
+                        content=None,
+                        function_call=None,
+                        refusal=None,
+                        role=None,
+                        tool_calls=[
+                            ChoiceDeltaToolCall(
+                                index=0,
+                                id=None,
+                                function=ChoiceDeltaToolCallFunction(
+                                    arguments='{"', name=None
+                                ),
+                                type=None,
+                            )
+                        ],
+                    ),
+                    finish_reason=None,
+                    index=0,
+                    logprobs=None,
+                    content_filter_results={},
+                )
+            ],
+            created=1748289435,
+            model="gpt-4.1-2025-04-14",
+            object="chat.completion.chunk",
+            service_tier=None,
+            system_fingerprint="fp_07e970ab25",
+            usage=None,
+        ),
+        ChatCompletionChunk(
+            id="chatcmpl-BbYEdy7cBIbJsbLXouL7Z47t93LUR",
+            choices=[
+                Choice(
+                    delta=ChoiceDelta(
+                        content=None,
+                        function_call=None,
+                        refusal=None,
+                        role=None,
+                        tool_calls=[
+                            ChoiceDeltaToolCall(
+                                index=0,
+                                id=None,
+                                function=ChoiceDeltaToolCallFunction(
+                                    arguments="location", name=None
+                                ),
+                                type=None,
+                            )
+                        ],
+                    ),
+                    finish_reason=None,
+                    index=0,
+                    logprobs=None,
+                    content_filter_results={},
+                )
+            ],
+            created=1748289435,
+            model="gpt-4.1-2025-04-14",
+            object="chat.completion.chunk",
+            service_tier=None,
+            system_fingerprint="fp_07e970ab25",
+            usage=None,
+        ),
+        ChatCompletionChunk(
+            id="chatcmpl-BbYEdy7cBIbJsbLXouL7Z47t93LUR",
+            choices=[
+                Choice(
+                    delta=ChoiceDelta(
+                        content=None,
+                        function_call=None,
+                        refusal=None,
+                        role=None,
+                        tool_calls=[
+                            ChoiceDeltaToolCall(
+                                index=0,
+                                id=None,
+                                function=ChoiceDeltaToolCallFunction(
+                                    arguments='":"', name=None
+                                ),
+                                type=None,
+                            )
+                        ],
+                    ),
+                    finish_reason=None,
+                    index=0,
+                    logprobs=None,
+                    content_filter_results={},
+                )
+            ],
+            created=1748289435,
+            model="gpt-4.1-2025-04-14",
+            object="chat.completion.chunk",
+            service_tier=None,
+            system_fingerprint="fp_07e970ab25",
+            usage=None,
+        ),
+        ChatCompletionChunk(
+            id="chatcmpl-BbYEdy7cBIbJsbLXouL7Z47t93LUR",
+            choices=[
+                Choice(
+                    delta=ChoiceDelta(
+                        content=None,
+                        function_call=None,
+                        refusal=None,
+                        role=None,
+                        tool_calls=[
+                            ChoiceDeltaToolCall(
+                                index=0,
+                                id=None,
+                                function=ChoiceDeltaToolCallFunction(
+                                    arguments="Paris", name=None
+                                ),
+                                type=None,
+                            )
+                        ],
+                    ),
+                    finish_reason=None,
+                    index=0,
+                    logprobs=None,
+                    content_filter_results={},
+                )
+            ],
+            created=1748289435,
+            model="gpt-4.1-2025-04-14",
+            object="chat.completion.chunk",
+            service_tier=None,
+            system_fingerprint="fp_07e970ab25",
+            usage=None,
+        ),
+        ChatCompletionChunk(
+            id="chatcmpl-BbYEdy7cBIbJsbLXouL7Z47t93LUR",
+            choices=[
+                Choice(
+                    delta=ChoiceDelta(
+                        content=None,
+                        function_call=None,
+                        refusal=None,
+                        role=None,
+                        tool_calls=[
+                            ChoiceDeltaToolCall(
+                                index=0,
+                                id=None,
+                                function=ChoiceDeltaToolCallFunction(
+                                    arguments='"}', name=None
+                                ),
+                                type=None,
+                            )
+                        ],
+                    ),
+                    finish_reason=None,
+                    index=0,
+                    logprobs=None,
+                    content_filter_results={},
+                )
+            ],
+            created=1748289435,
+            model="gpt-4.1-2025-04-14",
+            object="chat.completion.chunk",
+            service_tier=None,
+            system_fingerprint="fp_07e970ab25",
+            usage=None,
+        ),
+        ChatCompletionChunk(
+            id="chatcmpl-BbYEdy7cBIbJsbLXouL7Z47t93LUR",
+            choices=[
+                Choice(
+                    delta=ChoiceDelta(
+                        content=None,
+                        function_call=None,
+                        refusal=None,
+                        role=None,
+                        tool_calls=None,
+                    ),
+                    finish_reason="tool_calls",
+                    index=0,
+                    logprobs=None,
+                    content_filter_results={},
+                )
+            ],
+            created=1748289435,
+            model="gpt-4.1-2025-04-14",
+            object="chat.completion.chunk",
+            service_tier=None,
+            system_fingerprint="fp_07e970ab25",
+            usage=None,
+        ),
+    ]
 
     openai_mock_response = [
         ChatCompletionChunk(
@@ -395,6 +664,34 @@ class TestOpenAIStreamExtractorTests(unittest.TestCase):
             },
         )
         self.assertEqual(response_id, "chatcmpl-BbWigtG2AjFsEEXkAzbBlmiAL8sfz")
+
+    def test_extract_streamed_openai_response_function_tools(self):
+        melodi_message, response_id = _extract_streamed_openai_response(
+            resource=OpenAiDefinition(
+                module="openai",
+                object="ChatCompletion",
+                method="create",
+                type="chat",
+                sync=True,
+            ),
+            chunks=self.openai_mock_response_function_call,
+        )
+
+        self.assertEqual(
+            melodi_message.externalId, "chatcmpl-BbYEdy7cBIbJsbLXouL7Z47t93LUR"
+        )
+        self.assertEqual(melodi_message.role, "Assistant")
+        self.assertEqual(melodi_message.content, "")
+        self.assertEqual(
+            melodi_message.metadata,
+            {
+                "model": "gpt-4.1-2025-04-14",
+                "finish_reason": "tool_calls",
+                "created_at": 1748289435,
+                "tool_calls": '[{"name": "get_current_weather", "arguments": "{\\"location\\":\\"Paris\\"}"}]',
+            },
+        )
+        self.assertEqual(response_id, "chatcmpl-BbYEdy7cBIbJsbLXouL7Z47t93LUR")
 
     @patch("melodi.utils.openai_stream_generator.create_melodi_thread")
     def test_melodi_response_generator_sync(self, mock_melodi_thread):
