@@ -157,7 +157,8 @@ class TestOpenAIModules(unittest.TestCase):
         )
 
         for event in stream:
-            print(event)
+            pass
+            # print(event)
         pass
 
     @unittest.skip
