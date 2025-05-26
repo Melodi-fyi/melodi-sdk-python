@@ -143,6 +143,9 @@ def _get_response_metadata(response):
 
 
 def to_dict(input_value):
+    if not input_value:
+        return None
+
     if isinstance(input_value, dict):
         return input_value
 
