@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from melodi.utils.openai import OpenAI, AzureOpenAI, AsyncOpenAI, AsyncAzureOpenAI
+from melodi.utils.openai import AzureOpenAI
 
 
 class TestOpenAIModules(unittest.TestCase):
