@@ -95,6 +95,11 @@ class ThreadsClient(BaseClient):
             url = f"{url}&includeIntents={query_params.includeIntents}"
         if (query_params.includeIssues):
             url = f"{url}&includeIssues={query_params.includeIssues}"
+        if (query_params.metadataField):
+            url = f"{url}&metadataField={query_params.metadataField}"
+        if (query_params.metadataValue):
+            url = f"{url}&metadataValue={query_params.metadataValue}"
+
 
         try:
             response = requests.request("GET", url)
