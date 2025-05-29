@@ -6,7 +6,7 @@ from melodi.utils.openai import AzureOpenAI
 
 class TestOpenAIModules(unittest.TestCase):
 
-    @unittest.skip
+
     def test_openai_azure(self):
         client = AzureOpenAI(
             api_key=os.getenv("AZURE_API_KEY"),
