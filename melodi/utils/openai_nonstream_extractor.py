@@ -35,6 +35,8 @@ def _get_melodi_messages_from_openai_response(resource: OpenAiDefinition, respon
     if response is None:
         return [], None
 
+    response = to_dict(response)
+
     response_contents = []
     if resource.type == "completion":
         choices = response.get("choices", [])
