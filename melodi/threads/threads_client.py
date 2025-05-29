@@ -95,6 +95,12 @@ class ThreadsClient(BaseClient):
             url = f"{url}&includeIntents={query_params.includeIntents}"
         if (query_params.includeIssues):
             url = f"{url}&includeIssues={query_params.includeIssues}"
+        if (query_params.outcome):
+            url = f"{url}&outcome={query_params.outcome}"
+        if (query_params.filterInternal):
+            url = f"{url}&filterInternal={query_params.filterInternal}"
+        if (query_params.filterAnonymousSessions):
+            url = f"{url}&filterAnonymousSessions={query_params.filterAnonymousSessions}"
         if (query_params.metadataField):
             url = f"{url}&metadataField={query_params.metadataField}"
         if (query_params.metadataValue):

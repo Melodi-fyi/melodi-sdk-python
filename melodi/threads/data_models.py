@@ -33,8 +33,11 @@ class ThreadsQueryParams(BaseModel):
   hasFeedback: Optional[bool] = None
   feedbackType: Optional[Literal['POSITIVE', 'NEGATIVE']]= None
   attributeOptionIds: Optional[List[int]] = None
+  outcome: Optional[Literal['successful', 'partial_success', 'unsuccessful']] = None
   metadataField: Optional[str] = None
   metadataValue: Optional[str] = None
+  filterInternal: Optional[bool] = None
+  filterAnonymousSessions: Optional[bool] = None
   includeFeedback: Optional[bool] = None
   includeIntents: Optional[bool] = None
   includeIssues: Optional[bool] = None
