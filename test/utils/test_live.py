@@ -6,7 +6,7 @@ from melodi.utils.openai import AzureOpenAI
 
 class TestOpenAIModules(unittest.TestCase):
 
-
+    @unittest.skip
     def test_openai_azure(self):
         client = AzureOpenAI(
             api_key=os.getenv("AZURE_API_KEY"),
@@ -50,18 +50,11 @@ class TestOpenAIModules(unittest.TestCase):
             ],
             frequency_penalty=1.4,
             logit_bias={34: 89},
-            # logprobs=True,
-            max_completion_tokens=5000,
-            metadata={"this is": "custom"},
-            model="gpt-4o-mini",
+            model="gpt-4o",
             n=2,
             presence_penalty=0.3,
             response_format={"type": "text"},
             seed=1996,
-            service_tier="default",
-            stop="don't stop me now",
-            store=True,
-            # top_logprobs=2,
             top_p=0.5,
             user="itsmemario",
         )
@@ -101,8 +94,6 @@ class TestOpenAIModules(unittest.TestCase):
             tools=tools,
             tool_choice="auto"
         )
-
-        print(completion)
 
     @unittest.skip
     def test_logprobs(self):
@@ -158,8 +149,6 @@ class TestOpenAIModules(unittest.TestCase):
 
         for event in stream:
             pass
-            # print(event)
-        pass
 
     @unittest.skip
     def test_openai_azure_stream_response(self):

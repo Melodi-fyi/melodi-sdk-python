@@ -61,6 +61,11 @@ def _get_melodi_messages_from_openai_response(resource: OpenAiDefinition, respon
     response_metadata = _get_response_metadata(response)
     melodi_messages = []
     for message_dict in response_contents:
+        if len(response_contents) > 1:
+            id_suffix = f"-alternative-{len(melodi_messages)}"
+        else:
+            id_suffix = ""
+
         content = message_dict.pop("content", None)
         metadata = {"type": "response"}
         metadata.update(**message_dict)
@@ -68,7 +73,7 @@ def _get_melodi_messages_from_openai_response(resource: OpenAiDefinition, respon
 
         melodi_messages.append(
             Message(
-                externalId=metadata.get("id"),
+                externalId=f'{metadata.get("id")}{id_suffix}',
                 role=metadata.get("role").title(),
                 content=content,
                 metadata=metadata,
