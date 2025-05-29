@@ -93,7 +93,7 @@ class TestAsyncWrapper(IsolatedAsyncioTestCase):
         async for event in stream:
             pass
 
-    # @unittest.skip
+    @unittest.skip
     async def test_azure_openai_function_tools(self):
         client = AsyncAzureOpenAI(
             api_key=os.getenv("AZURE_API_KEY"),
