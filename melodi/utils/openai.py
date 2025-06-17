@@ -12,7 +12,7 @@ adding automatic logging with minimal code changes. Simply update your import:
 
 import logging
 import os
-from typing import Optional, Callable
+from typing import Callable, Optional
 
 from packaging.version import Version
 from wrapt import wrap_function_wrapper
@@ -22,9 +22,19 @@ from melodi.utils.openai_nonstream_extractor import (
     create_melodi_thread_from_openai_response,
 )
 from melodi.utils.openai_prompt_parser import _get_melodi_messages_from_openai_prompt
+from melodi.utils.openai_responses_extractor import (
+    create_melodi_thread_from_responses_response,
+)
+from melodi.utils.openai_responses_prompt_parser import (
+    get_melodi_messages_from_responses_prompt,
+)
+from melodi.utils.openai_responses_stream_generator import (
+    MelodiResponsesGeneratorAsync,
+    MelodiResponsesGeneratorSync,
+)
 from melodi.utils.openai_stream_generator import (
-    MelodiResponseGeneratorSync,
     MelodiResponseGeneratorAsync,
+    MelodiResponseGeneratorSync,
 )
 from melodi.utils.openai_utils import (
     OPENAI_CLIENTS_V0,
@@ -77,27 +87,56 @@ def _wrap(
     melodi_client = melodi_initialize_func()
     arg_extractor = OpenAiKwargsExtractor(**kwargs)
 
-    prompt_messages = _get_melodi_messages_from_openai_prompt(kwargs, openai_resource)
+    # Choose the appropriate prompt parser based on API type
+    if openai_resource.type == "response":
+        prompt_messages = get_melodi_messages_from_responses_prompt(
+            kwargs, openai_resource
+        )
+    else:
+        prompt_messages = _get_melodi_messages_from_openai_prompt(
+            kwargs, openai_resource
+        )
+
     try:
         openai_response = wrapped(**arg_extractor.get_openai_args())
 
         if _is_streaming_response(openai_response):
             try:
-                return MelodiResponseGeneratorSync(
+                # Choose the appropriate streaming generator based on API type
+                if openai_resource.type == "response":
+                    return MelodiResponsesGeneratorSync(
+                        openai_resource=openai_resource,
+                        openai_response=openai_response,
+                        melodi_client=melodi_client,
+                        prompt_messages=prompt_messages,
+                    )
+                else:
+                    return MelodiResponseGeneratorSync(
+                        openai_resource=openai_resource,
+                        openai_response=openai_response,
+                        melodi_client=melodi_client,
+                        prompt_messages=prompt_messages,
+                    )
+            except Exception as ex:
+                logger.error(
+                    f"Could not create Melodi thread out of streamed response: {repr(ex)}"
+                )
+        else:
+            # Choose the appropriate response handler based on API type
+            if openai_resource.type == "response":
+                create_melodi_thread_from_responses_response(
                     openai_resource=openai_resource,
                     openai_response=openai_response,
-                    melodi_client=melodi_client,
                     prompt_messages=prompt_messages,
+                    melodi_client=melodi_client,
                 )
-            except Exception as ex:
-                logger.error(f"Could not create Melodi thread out of streamed response: {repr(ex)}")
-        else:
-            create_melodi_thread_from_openai_response(
-                openai_resource=openai_resource,
-                openai_response=openai_response,
-                prompt_messages=prompt_messages,
-                melodi_client=melodi_client,
-            )
+            else:
+                create_melodi_thread_from_openai_response(
+                    openai_resource=openai_resource,
+                    openai_response=openai_response,
+                    prompt_messages=prompt_messages,
+                    melodi_client=melodi_client,
+                )
 
         return openai_response
     except Exception as ex:
@@ -121,28 +160,56 @@ async def _wrap_async(
     melodi_client = melodi_initialize_func()
     arg_extractor = OpenAiKwargsExtractor(**kwargs)
 
-    prompt_messages = _get_melodi_messages_from_openai_prompt(kwargs, openai_resource)
+    # Choose the appropriate prompt parser based on API type
+    if openai_resource.type == "response":
+        prompt_messages = get_melodi_messages_from_responses_prompt(
+            kwargs, openai_resource
+        )
+    else:
+        prompt_messages = _get_melodi_messages_from_openai_prompt(
+            kwargs, openai_resource
+        )
 
     try:
         openai_response = await wrapped(**arg_extractor.get_openai_args())
 
         if _is_streaming_response(openai_response):
             try:
-                return MelodiResponseGeneratorAsync(
+                # Choose the appropriate streaming generator based on API type
+                if openai_resource.type == "response":
+                    return MelodiResponsesGeneratorAsync(
+                        openai_resource=openai_resource,
+                        openai_response=openai_response,
+                        melodi_client=melodi_client,
+                        prompt_messages=prompt_messages,
+                    )
+                else:
+                    return MelodiResponseGeneratorAsync(
+                        openai_resource=openai_resource,
+                        openai_response=openai_response,
+                        melodi_client=melodi_client,
+                        prompt_messages=prompt_messages,
+                    )
+            except Exception as ex:
+                logger.error(
+                    f"Could not create Melodi thread out of streamed response: {repr(ex)}"
+                )
+        else:
+            # Choose the appropriate response handler based on API type
+            if openai_resource.type == "response":
+                create_melodi_thread_from_responses_response(
                     openai_resource=openai_resource,
                     openai_response=openai_response,
-                    melodi_client=melodi_client,
                     prompt_messages=prompt_messages,
+                    melodi_client=melodi_client,
                 )
-            except Exception as ex:
-                logger.error(f"Could not create Melodi thread out of streamed response: {repr(ex)}")
-        else:
-            create_melodi_thread_from_openai_response(
-                openai_resource=openai_resource,
-                openai_response=openai_response,
-                prompt_messages=prompt_messages,
-                melodi_client=melodi_client,
-            )
+            else:
+                create_melodi_thread_from_openai_response(
+                    openai_resource=openai_resource,
+                    openai_response=openai_response,
+                    prompt_messages=prompt_messages,
+                    melodi_client=melodi_client,
+                )
 
         return openai_response
     except Exception as ex:
