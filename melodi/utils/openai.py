@@ -52,7 +52,7 @@ except ImportError:
     raise ModuleNotFoundError("OpenAI not installed, please run: 'pip install openai'")
 
 try:
-    from openai import AsyncAzureOpenAI, AsyncOpenAI, AzureOpenAI, OpenAI  # noqa: F401
+    from openai import AsyncAzureOpenAI, AsyncOpenAI, AzureOpenAI, OpenAI
 except ImportError:
     AsyncAzureOpenAI = None
     AsyncOpenAI = None
@@ -87,7 +87,6 @@ def _wrap(
     melodi_client = melodi_initialize_func()
     arg_extractor = OpenAiKwargsExtractor(**kwargs)
 
-    # Choose the appropriate prompt parser based on API type
     if openai_resource.type == "response":
         prompt_messages = get_melodi_messages_from_responses_prompt(
             kwargs, openai_resource
@@ -102,7 +101,6 @@ def _wrap(
 
         if _is_streaming_response(openai_response):
             try:
-                # Choose the appropriate streaming generator based on API type
                 if openai_resource.type == "response":
                     return MelodiResponsesGeneratorSync(
                         openai_resource=openai_resource,
@@ -122,7 +120,6 @@ def _wrap(
                     f"Could not create Melodi thread out of streamed response: {repr(ex)}"
                 )
         else:
-            # Choose the appropriate response handler based on API type
             if openai_resource.type == "response":
                 create_melodi_thread_from_responses_response(
                     openai_resource=openai_resource,
@@ -160,7 +157,6 @@ async def _wrap_async(
     melodi_client = melodi_initialize_func()
     arg_extractor = OpenAiKwargsExtractor(**kwargs)
 
-    # Choose the appropriate prompt parser based on API type
     if openai_resource.type == "response":
         prompt_messages = get_melodi_messages_from_responses_prompt(
             kwargs, openai_resource
@@ -175,7 +171,6 @@ async def _wrap_async(
 
         if _is_streaming_response(openai_response):
             try:
-                # Choose the appropriate streaming generator based on API type
                 if openai_resource.type == "response":
                     return MelodiResponsesGeneratorAsync(
                         openai_resource=openai_resource,
@@ -195,7 +190,6 @@ async def _wrap_async(
                     f"Could not create Melodi thread out of streamed response: {repr(ex)}"
                 )
         else:
-            # Choose the appropriate response handler based on API type
             if openai_resource.type == "response":
                 create_melodi_thread_from_responses_response(
                     openai_resource=openai_resource,
