@@ -1,14 +1,12 @@
 import json
 import logging
+import types
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Optional
 
-import types
 import openai.resources
 from packaging.version import Version
-
-from datetime import datetime, timezone
-
 
 logger = logging.getLogger(__name__)
 
@@ -80,6 +78,39 @@ OPENAI_CLIENTS_V1 = [
         type="completion",
         sync=False,
     ),
+    # Responses API support
+    OpenAiDefinition(
+        module="openai.resources.responses.responses",
+        object="Responses",
+        method="create",
+        type="response",
+        sync=True,
+        min_version="1.80.0",  # Responses API was added in recent versions
+    ),
+    OpenAiDefinition(
+        module="openai.resources.responses.responses",
+        object="AsyncResponses",
+        method="create",
+        type="response",
+        sync=False,
+        min_version="1.80.0",
+    ),
+    OpenAiDefinition(
+        module="openai.resources.responses.responses",
+        object="Responses",
+        method="parse",
+        type="response",
+        sync=True,
+        min_version="1.80.0",
+    ),
+    OpenAiDefinition(
+        module="openai.resources.responses.responses",
+        object="AsyncResponses",
+        method="parse",
+        type="response",
+        sync=False,
+        min_version="1.80.0",
+    ),
 ]
 
 NON_STREAM_MESSAGE_KEYS = [
@@ -118,6 +149,44 @@ COMPLETION_USAGE_TOKENS_KEYS = [
 
 COMPLETION_USAGE_PROMPT_TOKENS_KEYS = [
     "cached_tokens",
+]
+
+# Responses API specific keys
+RESPONSE_MESSAGE_KEYS = [
+    "id",
+    "created_at",
+    "model",
+    "object",
+    "status",
+    "output_text",
+    "instructions",
+    "metadata",
+    "background",
+    "max_output_tokens",
+    "previous_response_id",
+    "reasoning",
+    "service_tier",
+    "text",
+    "truncation",
+    "user",
+    "parallel_tool_calls",
+    "temperature",
+    "tool_choice",
+    "tools",
+    "top_p",
+]
+
+RESPONSE_OUTPUT_MESSAGE_KEYS = [
+    "id",
+    "content",
+    "role",
+    "type",
+]
+
+RESPONSE_USAGE_KEYS = [
+    "input_tokens",
+    "output_tokens",
+    "total_tokens",
 ]
 
 GENERATION_PARAMETERS_DEFAULTS = {
