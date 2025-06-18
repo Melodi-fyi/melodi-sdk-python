@@ -182,9 +182,11 @@ def _get_responses_metadata(response: dict):
     # Extract usage details if available
     usage_details = usage_dict.get("output_tokens_details", {})
     if usage_details:
-        for key, value in usage_details.items():
-            if value is not None:
-                metadata[f"output_tokens_{key}"] = parse_metadata_value(value)
+        usage_details_dict = _to_dict(usage_details)
+        if usage_details_dict:
+            for key, value in usage_details_dict.items():
+                if value is not None:
+                    metadata[f"output_tokens_{key}"] = parse_metadata_value(value)
 
     return metadata
 
