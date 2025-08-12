@@ -7,6 +7,9 @@ from melodi.messages.data_models import Message, MessageResponse
 from melodi.users.data_models import User, UserResponse
 
 
+class ExternalUserForThread(User):
+    isInternal: Optional[bool] = None
+
 class Thread(BaseModel):
     id: Optional[int] = None
     externalId: Optional[str] = None
@@ -14,7 +17,7 @@ class Thread(BaseModel):
     projectName: Optional[str] = None
     messages: List[Message]
     metadata: dict[str, Union[str, int]] = {}
-    externalUser: Optional[User] = None
+    externalUser: Optional[ExternalUserForThread] = None
     createdAt: Optional[datetime] = None
 
 class ThreadsQueryParams(BaseModel):
