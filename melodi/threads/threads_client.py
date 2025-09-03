@@ -81,7 +81,7 @@ class ThreadsClient(BaseClient):
                 url = f"{url}&issueIds={issueId}"
         if (query_params.intentIds):
             for intentId in query_params.intentIds:
-                url = f"{url}&intentId={intentId}"
+                url = f"{url}&intentIds={intentId}"
         if (query_params.hasFeedback):
             url = f"{url}&hasFeedback={query_params.hasFeedback}"
         if (query_params.feedbackType):
