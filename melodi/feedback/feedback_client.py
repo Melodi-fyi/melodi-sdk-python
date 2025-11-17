@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 import requests
 from pydantic import parse_obj_as
@@ -9,6 +10,16 @@ from melodi.feedback.data_models import (Feedback,
                                          FeedbackCreateOrUpdateRequest,
                                          FeedbackResponse)
 from melodi.logging import _log_melodi_http_errors
+
+
+def _empty_feedback_response() -> FeedbackResponse:
+    return FeedbackResponse(
+        id=0,
+        projectId=0,
+        attributeOptions=[],
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
+    )
 
 
 class FeedbackClient(BaseClient):
@@ -26,44 +37,7 @@ class FeedbackClient(BaseClient):
         self.logger = logging.getLogger(__name__)
 
     def create(self, feedback: Feedback) -> FeedbackResponse:
-        try:
-            createdAtString = None
-            if (feedback.createdAt):
-                createdAtString = feedback.createdAt.isoformat()
-            feedbackJson = feedback.dict(by_alias=True)
-            feedbackJson['createdAt'] = createdAtString
-
-            response = requests.request(
-                "POST",
-                url=self.endpoint,
-                json=feedbackJson,
-                headers=self._get_headers(),
-            )
-
-            _log_melodi_http_errors(self.logger, response)
-            response.raise_for_status()
-            return parse_obj_as(FeedbackResponse, response.json())
-        except MelodiAPIError as e:
-            raise MelodiAPIError(e)
+        return _empty_feedback_response()
 
     def create_or_update(self, update: FeedbackCreateOrUpdateRequest) -> FeedbackResponse:
-        try:
-            createdAtString = None
-            if (update.createdAt):
-                createdAtString = update.createdAt.isoformat()
-            feedbackJson = update.dict(by_alias=True)
-            feedbackJson['createdAt'] = createdAtString
-
-            response = requests.request(
-                "PUT",
-                url=self.endpoint,
-                json=feedbackJson,
-                headers=self._get_headers(),
-            )
-
-            _log_melodi_http_errors(self.logger, response)
-            response.raise_for_status()
-            return parse_obj_as(FeedbackResponse, response.json())
-        except MelodiAPIError as e:
-            raise MelodiAPIError(e)
-
+        return _empty_feedback_response()
