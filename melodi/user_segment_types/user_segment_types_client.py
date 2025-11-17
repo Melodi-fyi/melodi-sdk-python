@@ -26,17 +26,4 @@ class UserSegmentTypesClient(BaseClient):
         self.logger = logging.getLogger(__name__)
 
     def get(self, query_params: UserSegmentTypesQueryParams = UserSegmentTypesQueryParams()) -> List[UserSegmentTypeDefinition]:
-        url = self.endpoint
-
-        if (query_params.projectId):
-            url = f"{url}&projectId={query_params.projectId}"
-
-        try:
-            response = requests.request("GET", url)
-
-            _log_melodi_http_errors(self.logger, response)
-            response.raise_for_status()
-
-            return parse_obj_as(List[UserSegmentTypeDefinition], response.json())
-        except MelodiAPIError as e:
-            raise MelodiAPIError(e)
+        return []

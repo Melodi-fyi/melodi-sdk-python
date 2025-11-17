@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 import requests
 from pydantic import parse_obj_as
@@ -7,6 +8,14 @@ from melodi.base_client import BaseClient
 from melodi.exceptions import MelodiAPIError
 from melodi.intents.data_models import IntentResponse, IntentUpsertRequest
 from melodi.logging import _log_melodi_http_errors
+
+
+def _empty_intent_response() -> IntentResponse:
+    return IntentResponse(
+        id=0,
+        name="SAMPLE",
+        createdAt=datetime.now(),
+    )
 
 
 class IntentsClient(BaseClient):
@@ -20,13 +29,4 @@ class IntentsClient(BaseClient):
         self.logger = logging.getLogger(__name__)
 
     def upsert(self, intentUpsertRequest: IntentUpsertRequest) -> IntentResponse:
-        try:
-            response = requests.put(
-                self.endpoint, headers=self._get_headers(), json=intentUpsertRequest.dict(by_alias=True)
-            )
-
-            _log_melodi_http_errors(self.logger, response)
-            response.raise_for_status()
-            return parse_obj_as(IntentResponse, response.json())
-        except MelodiAPIError as e:
-            raise MelodiAPIError(e)
+        return _empty_intent_response()

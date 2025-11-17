@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='melodi',
-    version='0.1.37',
+    version='0.2.0',
     packages=find_packages(),
     install_requires=[
         'requests',
@@ -19,7 +19,7 @@ setup(
     },
     author='Melodi Ltd',
     author_email='info@melodi.fyi',
-    description='Helper functions for Melodi',
+    description='Helper functions for Melodi - DEPRECATED',
     keywords='melodi',
     long_description=long_description,
     long_description_content_type='text/markdown',
